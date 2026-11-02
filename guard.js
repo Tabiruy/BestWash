@@ -21,7 +21,7 @@
     try {
       // ---------- Halaman ADMIN ----------
       if (role === "admin") {
-        if (BestWashAuth.isAdminLocal()) return show();
+        if (await BestWashAuth.isAdminSession()) return show();
         return location.replace("login.html?admin=1");
       }
 

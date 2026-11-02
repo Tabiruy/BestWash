@@ -9,6 +9,7 @@
   <!-- Supabase + proteksi halaman (HARUS di <head>, sebelum script lain) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
+  <script src="orders-api.js"></script>
   <script src="guard.js" data-role="user"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -201,7 +202,7 @@ tailwind.config = {
       saveServices(s) { this.save('services', s); },
       settings() { return Object.assign({}, DEFAULT_SETTINGS, this.load('settings', {})); },
       saveSettings(o) { this.save('settings', o); },
-      orders() { return this.load('orders', []); },
+      orders() { return OrdersAPI.list(); },
       saveOrders(o) { this.save('orders', o); },
       customers() { return this.load('customers', []); },
       profile(u) { return this.load('profile_' + String(u).toLowerCase(), {}); },
@@ -212,7 +213,7 @@ tailwind.config = {
         if (c) { if (email && !c.email) c.email = email; } else list.push({ username, email: email || '', joinedAt: new Date().toISOString() });
         this.save('customers', list);
       },
-      addOrder(d) {
+      addOrder(d) { throw new Error('Gunakan OrdersAPI.create()');
         const list = this.orders();
         const t = new Date();
         const ymd = t.getFullYear() + String(t.getMonth() + 1).padStart(2, '0') + String(t.getDate()).padStart(2, '0');
@@ -231,7 +232,7 @@ tailwind.config = {
       const snap = () => { try { return ['orders', 'services', 'settings', 'customers'].map((k) => localStorage.getItem('bestwash_' + k)).join('|'); } catch (e) { return ''; } };
       let last = snap();
       const check = () => { const now = snap(); if (now !== last) { last = now; fn(); } };
-      window.addEventListener('storage', check);
+      window.addEventListener('storage', check); OrdersAPI.onChange(fn);
       setInterval(check, 1500);
     }
 
@@ -274,13 +275,13 @@ tailwind.config = {
       };
       form.addEventListener('input', paint);
       form.addEventListener('change', paint);
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const c = calc();
         if (!c.svc) { alert('Paket yang dipilih tidak tersedia. Silakan pilih paket lain.'); return; }
         const v = (s) => { const el = q(s); return el ? el.value.trim() : ''; };
         const me = Auth.get();
-        const order = DB.addOrder({ user: me, nama: v('#nama') || me, hp: v('#hp'), paketId: c.svc.id, paket: c.svc.nama, harga: c.svc.harga, berat: c.berat, parfum: v('#parfum'), antar: c.antar, ongkir: c.ongkir, biaya: c.biaya, total: c.total, alamat: v('#alamat'), catatan: v('#catatan') });
+        let order; try { order = await OrdersAPI.create({ user: me, nama: v('#nama') || me, hp: v('#hp'), paketId: c.svc.id, paket: c.svc.nama, harga: c.svc.harga, berat: c.berat, parfum: v('#parfum'), antar: c.antar, ongkir: c.ongkir, biaya: c.biaya, total: c.total, alamat: v('#alamat'), catatan: v('#catatan') }); } catch (err) { return alert('Gagal mengirim pesanan: ' + (err.message || err)); }
         opt.onDone(order);
       });
       renderPackages(); paint();
@@ -298,7 +299,7 @@ tailwind.config = {
       const TABS = {
         beranda: ['Selamat Datang, ' + me + ' 👋', 'Kelola cucian dan pantau status pesananmu di sini.'],
         status: ['Status Laundry', 'Pantau tahap pengerjaan cucianmu. Diperbarui otomatis.'],
-        riwayat: ['Riwayat Transaksi', 'Semua pesanan yang pernah kamu buat.'],
+        riwayat: ['Riwayat Transaksi', 'Pesanan yang sudah selesai tersimpan di sini.'],
         tarif: ['Layanan & Tarif', 'Pilih paket yang sesuai, lalu langsung pesan.'],
         profil: ['Profil & Alamat', 'Data ini dipakai untuk mengisi formulir pemesanan otomatis.'],
         bantuan: ['Bantuan CS', 'Pertanyaan umum dan kontak BestWash.'],
@@ -334,7 +335,7 @@ tailwind.config = {
         return `<li class="relative flex gap-3 ${last ? '' : 'pb-5 after:absolute after:left-[17px] after:top-9 after:h-[calc(100%-2.25rem)] after:w-0.5 after:bg-slate-200'}"><span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${circle}"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icon}</svg></span><div class="min-w-0"><p class="text-sm font-bold ${cur ? 'text-heading' : done ? 'text-slate-800' : 'text-slate-400'}">${esc(TITLES[i])}</p><p class="text-xs ${done || cur ? 'text-slate-500' : 'text-slate-400'}">${esc(desc)}</p></div></li>`;
       }
       const head = (o) => `<div class="flex items-start justify-between gap-3"><div class="min-w-0"><p class="text-sm font-extrabold text-heading">#${esc(o.id)}</p><p class="text-xs text-slate-500">${esc(o.paket)} · ${o.berat} kg · ${rp(o.total)}</p></div><span class="shrink-0 rounded-full px-3 py-1 text-xs font-bold ${BADGE[o.status]}">${esc(STATUS[o.status])}</span></div>`;
-      const timeline = (o) => `<article class="rounded-2xl border border-slate-200 p-4">${head(o)}<ol class="mt-4 border-t border-slate-100 pt-4">${[0, 1, 2, 3, 4].map((i) => step(o, i)).join('')}</ol></article>`;
+      const timeline = (o) => `<article class="rounded-2xl border border-slate-200 p-4">${head(o)}<ol class="mt-4 border-t border-slate-100 pt-4">${[0, 1, 2, 3, 4].map((i) => step(o, i)).join('')}</ol>${o.status === 4 ? '<button type="button" data-selesai="' + esc(o.id) + '" class="mt-4 w-full rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-emerald-700">Cucian sudah saya terima &middot; Tandai Selesai</button>' : ''}</article>`;
       const empty = (t) => `<p class="rounded-2xl bg-slate-50 p-5 text-center text-sm text-slate-500">${t}</p>`;
       const mine = () => DB.orders().filter((o) => sameUser(o.user, me)).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
@@ -347,9 +348,9 @@ tailwind.config = {
         $('status-list').innerHTML = (active.map(timeline).join('') + (showAll ? done.map((o) => `<article class="rounded-2xl border border-slate-100 bg-slate-50 p-4">${head(o)}</article>`).join('') : '')) || empty('Belum ada cucian aktif. Buat pesanan lewat formulir.');
         $('status-toggle').textContent = showAll ? 'Sembunyikan Pesanan Selesai' : 'Tampilkan Pesanan Selesai' + (done.length ? ' (' + done.length + ')' : '');
         // riwayat
-        const total = all.reduce((t, o) => t + o.total, 0);
-        $('riwayat-sum').textContent = all.length + ' pesanan · total ' + rp(total);
-        $('riwayat').innerHTML = all.length ? `<table class="w-full min-w-[640px] text-left text-sm"><thead class="border-b border-slate-200 text-xs uppercase tracking-wide text-navy"><tr>${['Tanggal', 'No. Order', 'Layanan', 'Berat', 'Total', 'Status'].map((h) => `<th class="px-3 py-3 font-bold">${h}</th>`).join('')}</tr></thead><tbody class="divide-y divide-slate-100">${all.map((o) => `<tr><td class="px-3 py-3">${fmtD(o.createdAt)}</td><td class="px-3 py-3 font-semibold">${esc(o.id)}</td><td class="px-3 py-3">${esc(o.paket)}</td><td class="px-3 py-3">${o.berat} kg</td><td class="px-3 py-3 font-semibold">${rp(o.total)}</td><td class="px-3 py-3"><span class="inline-block rounded-full px-3 py-1 text-xs font-bold ${BADGE[o.status]}">${esc(STATUS[o.status])}</span></td></tr>`).join('')}</tbody></table>` : empty('Belum ada transaksi.');
+        const total = done.reduce((t, o) => t + o.total, 0);
+        $('riwayat-sum').textContent = done.length + ' pesanan · total ' + rp(total);
+        $('riwayat').innerHTML = done.length ? `<table class="w-full min-w-[640px] text-left text-sm"><thead class="border-b border-slate-200 text-xs uppercase tracking-wide text-navy"><tr>${['Tanggal', 'No. Order', 'Layanan', 'Berat', 'Total', 'Status'].map((h) => `<th class="px-3 py-3 font-bold">${h}</th>`).join('')}</tr></thead><tbody class="divide-y divide-slate-100">${done.map((o) => `<tr><td class="px-3 py-3">${fmtD(o.createdAt)}</td><td class="px-3 py-3 font-semibold">${esc(o.id)}</td><td class="px-3 py-3">${esc(o.paket)}</td><td class="px-3 py-3">${o.berat} kg</td><td class="px-3 py-3 font-semibold">${rp(o.total)}</td><td class="px-3 py-3"><span class="inline-block rounded-full px-3 py-1 text-xs font-bold ${BADGE[o.status]}">${esc(STATUS[o.status])}</span></td></tr>`).join('')}</tbody></table>` : empty('Belum ada transaksi selesai. Pesanan yang sudah selesai otomatis masuk ke sini.');
         renderTarif();
       }
       function renderTarif() {
@@ -405,6 +406,15 @@ tailwind.config = {
       const baru = new URLSearchParams(location.search).get('baru');
       applySettings(); renderAll(); setTab();
       if (baru) toast('Pesanan #' + baru + ' berhasil dibuat dan masuk ke Status Laundry.');
+      document.addEventListener('click', (e) => {
+        const b = e.target.closest('[data-selesai]'); if (!b) return;
+        const id = b.dataset.selesai;
+        if (!confirm('Tandai pesanan ' + id + ' sebagai selesai?')) return;
+        b.disabled = true;
+        OrdersAPI.complete(id)
+          .then(() => toast('Pesanan ' + id + ' selesai dan tersimpan di Riwayat Transaksi.'))
+          .catch((err) => { b.disabled = false; alert('Gagal: ' + (err.message || err)); });
+      });
       window.addEventListener('hashchange', setTab);
       watch(() => { renderAll(); applySettings(); });   // status/layanan berubah dari panel admin -> tampil langsung
     })();

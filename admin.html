@@ -9,6 +9,7 @@
   <!-- Supabase + proteksi halaman (HARUS di <head>, sebelum script lain) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
+  <script src="orders-api.js"></script>
   <script src="guard.js" data-role="admin"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -101,9 +102,9 @@ tailwind.config = {
         </form>
         <div class="rounded-2xl bg-white/95 p-5 shadow-lg sm:p-6">
           <h2 class="text-lg font-bold text-heading">Data</h2>
-          <p class="mt-1 text-sm text-slate-500">Semua data tersimpan di browser ini (localStorage).</p>
+          <p class="mt-1 text-sm text-slate-500">Pesanan tersimpan di Supabase. Layanan &amp; pengaturan masih di browser ini (localStorage).</p>
           <div class="mt-4 flex flex-wrap gap-3">
-            <button id="btn-seed" type="button" class="rounded-full border border-heading/30 px-5 py-2.5 text-sm font-bold text-heading hover:bg-brand/10">Tambah Data Contoh</button>
+            <button id="btn-seed" type="button" hidden class="rounded-full border border-heading/30 px-5 py-2.5 text-sm font-bold text-heading hover:bg-brand/10">Tambah Data Contoh</button>
             <button id="btn-clear-orders" type="button" class="rounded-full border border-amber-300 bg-amber-50 px-5 py-2.5 text-sm font-bold text-amber-800 hover:bg-amber-100">Hapus Semua Pesanan</button>
             <button id="btn-reset" type="button" class="rounded-full border border-rose-300 bg-rose-50 px-5 py-2.5 text-sm font-bold text-rose-700 hover:bg-rose-100">Reset Semua Data</button>
           </div>
@@ -185,7 +186,7 @@ tailwind.config = {
       saveServices(s) { this.save('services', s); },
       settings() { return Object.assign({}, DEFAULT_SETTINGS, this.load('settings', {})); },
       saveSettings(o) { this.save('settings', o); },
-      orders() { return this.load('orders', []); },
+      orders() { return OrdersAPI.list(); },
       saveOrders(o) { this.save('orders', o); },
       customers() { return this.load('customers', []); },
       profile(u) { return this.load('profile_' + String(u).toLowerCase(), {}); },
@@ -196,7 +197,7 @@ tailwind.config = {
         if (c) { if (email && !c.email) c.email = email; } else list.push({ username, email: email || '', joinedAt: new Date().toISOString() });
         this.save('customers', list);
       },
-      addOrder(d) {
+      addOrder(d) { throw new Error('Gunakan OrdersAPI.create()');
         const list = this.orders();
         const t = new Date();
         const ymd = t.getFullYear() + String(t.getMonth() + 1).padStart(2, '0') + String(t.getDate()).padStart(2, '0');
@@ -215,7 +216,7 @@ tailwind.config = {
       const snap = () => { try { return ['orders', 'services', 'settings', 'customers'].map((k) => localStorage.getItem('bestwash_' + k)).join('|'); } catch (e) { return ''; } };
       let last = snap();
       const check = () => { const now = snap(); if (now !== last) { last = now; fn(); } };
-      window.addEventListener('storage', check);
+      window.addEventListener('storage', check); OrdersAPI.onChange(fn);
       setInterval(check, 1500);
     }
 
@@ -258,13 +259,13 @@ tailwind.config = {
       };
       form.addEventListener('input', paint);
       form.addEventListener('change', paint);
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const c = calc();
         if (!c.svc) { alert('Paket yang dipilih tidak tersedia. Silakan pilih paket lain.'); return; }
         const v = (s) => { const el = q(s); return el ? el.value.trim() : ''; };
         const me = Auth.get();
-        const order = DB.addOrder({ user: me, nama: v('#nama') || me, hp: v('#hp'), paketId: c.svc.id, paket: c.svc.nama, harga: c.svc.harga, berat: c.berat, parfum: v('#parfum'), antar: c.antar, ongkir: c.ongkir, biaya: c.biaya, total: c.total, alamat: v('#alamat'), catatan: v('#catatan') });
+        let order; try { order = await OrdersAPI.create({ user: me, nama: v('#nama') || me, hp: v('#hp'), paketId: c.svc.id, paket: c.svc.nama, harga: c.svc.harga, berat: c.berat, parfum: v('#parfum'), antar: c.antar, ongkir: c.ongkir, biaya: c.biaya, total: c.total, alamat: v('#alamat'), catatan: v('#catatan') }); } catch (err) { return alert('Gagal mengirim pesanan: ' + (err.message || err)); }
         opt.onDone(order);
       });
       renderPackages(); paint();
@@ -355,14 +356,14 @@ tailwind.config = {
         if (e.target.dataset.act !== 'status') return;
         const list = DB.orders(), o = list.find((x) => x.id === e.target.dataset.id);
         if (!o) return;
-        o.status = parseInt(e.target.value, 10); o.updatedAt = new Date().toISOString();
-        DB.saveOrders(list); render(); toast('Status ' + o.id + ' diubah: ' + STATUS[o.status]);
+        const st = parseInt(e.target.value, 10);
+        OrdersAPI.update(o.id, { status: st }).then(() => toast('Status ' + o.id + ' diubah: ' + STATUS[st])).catch((err) => { render(); toast('Gagal: ' + (err.message || err)); });
       });
       $('tbl-pesanan').addEventListener('click', (e) => {
         const b = e.target.closest('button[data-act]'); if (!b) return;
         const list = DB.orders(), o = list.find((x) => x.id === b.dataset.id); if (!o) return;
         if (b.dataset.act === 'edit') openOrder(o);
-        if (b.dataset.act === 'del' && confirm('Hapus pesanan ' + o.id + '?')) { DB.saveOrders(list.filter((x) => x.id !== o.id)); render(); toast('Pesanan dihapus'); }
+        if (b.dataset.act === 'del' && confirm('Hapus pesanan ' + o.id + '?')) { OrdersAPI.remove(o.id).then(() => toast('Pesanan dihapus')).catch((err) => toast('Gagal: ' + (err.message || err))); }
       });
       $('q-pesanan').addEventListener('input', renderPesanan);
       $('f-status').addEventListener('change', renderPesanan);
@@ -399,15 +400,15 @@ tailwind.config = {
         openOrder(null);
       });
       $('form-order').addEventListener('input', () => { $('o-total').textContent = rp(orderTotal().total); });
-      $('form-order').addEventListener('submit', (e) => {
+      $('form-order').addEventListener('submit', async (e) => {
         e.preventDefault();
         const c = orderTotal(); if (!c.svc) return toast('Pilih layanan terlebih dahulu.');
         const id = $('o-id').value, nama = $('o-nama').value.trim();
         const data = { nama, hp: $('o-hp').value.trim(), paketId: c.svc.id, paket: c.svc.nama.replace(/ \(dihapus\)$/, ''), harga: c.harga, berat: c.berat, parfum: $('o-parfum').value, antar: $('o-antar').checked, ongkir: c.ongkir, biaya: c.biaya, total: c.total, alamat: $('o-alamat').value.trim(), catatan: $('o-catatan').value.trim(), status: parseInt($('o-status').value, 10) };
-        if (id) {
-          const list = DB.orders(), o = list.find((x) => x.id === id);
-          Object.assign(o, data, { updatedAt: new Date().toISOString() }); DB.saveOrders(list);
-        } else { DB.addOrder(Object.assign({ user: nama }, data)); DB.addCustomer(nama); }
+        try {
+          if (id) await OrdersAPI.update(id, data);
+          else { await OrdersAPI.create(Object.assign({ user: nama }, data), true); DB.addCustomer(nama); }
+        } catch (err) { return toast('Gagal: ' + (err.message || err)); }
         $('dlg-order').close(); render(); toast('Pesanan disimpan');
       });
 
@@ -497,7 +498,7 @@ tailwind.config = {
         });
         render(); toast('Data contoh ditambahkan');
       });
-      $('btn-clear-orders').addEventListener('click', () => { if (confirm('Hapus SEMUA pesanan?')) { DB.saveOrders([]); render(); toast('Semua pesanan dihapus'); } });
+      $('btn-clear-orders').addEventListener('click', () => { if (confirm('Hapus SEMUA pesanan?')) { OrdersAPI.removeAll().then(() => toast('Semua pesanan dihapus')).catch((err) => toast('Gagal: ' + (err.message || err))); } });
       $('btn-reset').addEventListener('click', () => {
         if (!confirm('Reset semua data (pesanan, layanan, pelanggan, pengaturan)?')) return;
         ['orders', 'services', 'settings', 'customers'].forEach((k) => localStorage.removeItem('bestwash_' + k));

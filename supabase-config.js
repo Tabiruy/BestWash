@@ -87,6 +87,18 @@ const BestWashAuth = {
     } catch (e) {}
   },
 
+  // Apakah sesi Supabase saat ini milik admin? (cek ke fungsi is_admin() di database)
+  async isAdminSession() {
+    try {
+      const session = await this.getSession();
+      if (!session) return false;
+      const { data, error } = await supabaseClient.rpc("is_admin");
+      return !error && data === true;
+    } catch (e) {
+      return false;
+    }
+  },
+
   // Salin username dari Supabase ke localStorage agar dashboard.html bisa membacanya
   async syncLocalUser(session) {
     session = session || (await this.getSession());
