@@ -2,11 +2,10 @@
 // auth.js  ->  dipakai di login.html dan register.html
 // =====================================================================
 
-// ⚠️ AKUN ADMIN SEMENTARA (sesuai permintaan: admin / admin123)
-// Nilai ini terlihat oleh siapa pun yang membuka "View Source".
-// Cukup untuk tugas/demo, JANGAN dipakai untuk aplikasi sungguhan.
+// Admin = akun Supabase biasa yang user_id-nya terdaftar di tabel public.admins.
+// Di form login: ketik username "admin" + password akun tersebut.
 const ADMIN_USERNAME = "admin";
-const ADMIN_PASSWORD = "admin123";
+const ADMIN_EMAIL = "prawiratamaannaafi@gmail.com"; // email akun admin di Supabase
 
 document.addEventListener("DOMContentLoaded", () => {
   const loginForm = document.getElementById("login-form");
@@ -103,14 +102,28 @@ document.addEventListener("DOMContentLoaded", () => {
       const username = $("username").value.trim();
       const password = $("password").value;
 
-      // ---- 1) Cek ADMIN dulu (tidak butuh Supabase sama sekali) ----
-      if (
-        username.toLowerCase() === ADMIN_USERNAME &&
-        password === ADMIN_PASSWORD
-      ) {
-        if (supabaseClient) supabaseClient.auth.signOut().catch(() => {}); // buang sesi user lain
-        BestWashAuth.setLocal("admin", "admin");
-        location.href = "admin.html";
+      // ---- 1) Admin: login Supabase pakai ADMIN_EMAIL, lalu dicek lewat tabel admins ----
+      if (username.toLowerCase() === ADMIN_USERNAME) {
+        if (!SUPABASE_READY) return showAlert(supabaseNotReadyMessage());
+        const btn = loginForm.querySelector('button[type="submit"]');
+        setLoading(btn, true);
+        try {
+          const { error } = await supabaseClient.auth.signInWithPassword({
+            email: ADMIN_EMAIL,
+            password,
+          });
+          if (error) throw error;
+          if (!(await BestWashAuth.isAdminSession())) {
+            await supabaseClient.auth.signOut();
+            return showAlert("Akun ini belum terdaftar sebagai admin.");
+          }
+          BestWashAuth.setLocal("admin", "admin");
+          location.href = "admin.html";
+        } catch (err) {
+          showAlert(translateError(err));
+        } finally {
+          setLoading(btn, false);
+        }
         return;
       }
 
