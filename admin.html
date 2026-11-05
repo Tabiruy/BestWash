@@ -344,13 +344,15 @@ tailwind.config = {
       function renderPesanan() {
         const q = $('q-pesanan').value.trim().toLowerCase(), f = $('f-status').value;
         const rows = newest(DB.orders()).filter((o) => (f === '' || String(o.status) === f) && (!q || [o.id, o.nama, o.user, o.paket].join(' ').toLowerCase().includes(q)));
+        const pri = (o) => (o.prioritas && o.status < 5 ? 1 : 0);
+        rows.sort((a, b) => pri(b) - pri(a));   // member (prioritas) dikerjakan lebih dulu
         $('tbl-pesanan').innerHTML = table(['Pesanan', 'Pelanggan', 'Layanan', 'Total', 'Status', 'Aksi'], rows.map((o) => `<tr>
-          <td class="${TD} font-semibold">${esc(o.id)}<div class="text-xs font-normal text-slate-500">${fmtDT(o.createdAt)}</div></td>
+          <td class="${TD} font-semibold">${esc(o.id)}${o.prioritas ? ' <span class="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">PRIORITAS</span>' : ''}<div class="text-xs font-normal text-slate-500">${fmtDT(o.createdAt)}</div></td>
           <td class="${TD}">${esc(o.nama)}<div class="text-xs text-slate-500">${esc(o.hp)}</div></td>
-          <td class="${TD}">${esc(o.paket)}<div class="text-xs text-slate-500">${o.berat} kg${o.antar ? ' · antar-jemput' : ''}</div></td>
+          <td class="${TD}">${esc(o.paket)}<div class="text-xs ${o.berat > 0 ? 'text-slate-500' : 'font-semibold text-amber-600'}">${o.berat > 0 ? o.berat + ' kg' : 'belum ditimbang'}${o.antar ? ' · antar-jemput' + (o.jarak != null ? ' (' + o.jarak + ' km)' : '') : ''}</div><div class="text-xs text-slate-500">${o.member ? 'Member -' + o.diskon + '% · ' : ''}${esc(o.bayar)} · ${o.bayarStatus === 'lunas' ? '<b class="text-emerald-600">lunas</b>' : 'belum bayar'}</div></td>
           <td class="${TD} font-semibold">${rp(o.total)}</td>
           <td class="${TD}"><select data-act="status" data-id="${esc(o.id)}" aria-label="Status ${esc(o.id)}" class="rounded-lg border-0 py-1.5 pl-3 pr-8 text-xs font-bold ${BADGE[o.status]}">${STATUS.map((s, i) => `<option value="${i}"${i === o.status ? ' selected' : ''}>${esc(s)}</option>`).join('')}</select></td>
-          <td class="${TD} whitespace-nowrap"><button type="button" data-act="edit" data-id="${esc(o.id)}" class="${BTN}border-heading/30 text-heading hover:bg-brand/10">Edit</button> <button type="button" data-act="del" data-id="${esc(o.id)}" class="${BTN}border-rose-300 text-rose-600 hover:bg-rose-50">Hapus</button></td></tr>`), 'Tidak ada pesanan yang cocok.');
+          <td class="${TD} whitespace-nowrap">${o.bayarStatus === 'lunas' ? '' : `<button type="button" data-act="lunas" data-id="${esc(o.id)}" class="${BTN}border-emerald-300 text-emerald-700 hover:bg-emerald-50">Lunas</button> `}<button type="button" data-act="edit" data-id="${esc(o.id)}" class="${BTN}border-heading/30 text-heading hover:bg-brand/10">Edit</button> <button type="button" data-act="del" data-id="${esc(o.id)}" class="${BTN}border-rose-300 text-rose-600 hover:bg-rose-50">Hapus</button></td></tr>`), 'Tidak ada pesanan yang cocok.');
       }
       $('tbl-pesanan').addEventListener('change', (e) => {
         if (e.target.dataset.act !== 'status') return;
@@ -363,6 +365,7 @@ tailwind.config = {
         const b = e.target.closest('button[data-act]'); if (!b) return;
         const list = DB.orders(), o = list.find((x) => x.id === b.dataset.id); if (!o) return;
         if (b.dataset.act === 'edit') openOrder(o);
+        if (b.dataset.act === 'lunas') OrdersAPI.update(o.id, { bayarStatus: 'lunas' }).then(() => toast('Pembayaran ' + o.id + ' ditandai lunas')).catch((err) => toast('Gagal: ' + (err.message || err)));
         if (b.dataset.act === 'del' && confirm('Hapus pesanan ' + o.id + '?')) { OrdersAPI.remove(o.id).then(() => toast('Pesanan dihapus')).catch((err) => toast('Gagal: ' + (err.message || err))); }
       });
       $('q-pesanan').addEventListener('input', renderPesanan);
@@ -377,7 +380,9 @@ tailwind.config = {
         const harga = svc ? (old && old.paketId === svc.id ? old.harga : svc.harga) : 0;
         const berat = parseFloat($('o-berat').value) || 0;
         const ongkir = $('o-antar').checked ? (old && old.antar ? old.ongkir : DB.settings().ongkir) : 0;
-        return { svc, harga, berat, ongkir, biaya: harga * berat, total: harga * berat + ongkir };
+        const diskon = old ? old.diskon || 0 : 0;   // diskon member yang tercatat di pesanan
+        const biaya = harga * berat;
+        return { svc, harga, berat, ongkir, biaya, total: Math.round(biaya * (1 - diskon / 100)) + ongkir };
       }
       function openOrder(o) {
         $('o-title').textContent = o ? 'Edit Pesanan ' + o.id : 'Tambah Pesanan';
@@ -387,7 +392,7 @@ tailwind.config = {
         $('o-svc').innerHTML = act.map((s) => `<option value="${esc(s.id)}">${esc(s.nama)} (${rp(s.harga)}/kg)</option>`).join('');
         $('o-nama').value = o ? o.nama : ''; $('o-hp').value = o ? o.hp || '' : '';
         if (o) $('o-svc').value = o.paketId;
-        $('o-berat').value = o ? o.berat : 3;
+        $('o-berat').value = o ? (o.berat > 0 ? o.berat : '') : 3;   // pesanan baru dari pelanggan: isi berat hasil timbangan
         $('o-parfum').value = o && o.parfum ? o.parfum : 'Ocean Fresh';
         $('o-status').value = o ? o.status : 0;
         $('o-antar').checked = o ? !!o.antar : false;

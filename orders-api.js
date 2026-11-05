@@ -5,6 +5,9 @@
 // Data disimpan di cache memori supaya kode tampilan lama (yang sinkron,
 // mis. DB.orders()) tetap jalan. Cache diperbarui lewat Supabase Realtime.
 // =====================================================================
+// Pengaturan membership (dipakai dashboard.html)
+const MEMBER = { fee: 30000, hari: 30, diskon: 10 };
+
 const OrdersAPI = (() => {
   let cache = [], sig = "", started = false;
   const listeners = [];
@@ -17,6 +20,11 @@ const OrdersAPI = (() => {
     parfum: r.parfum || "", antar: r.antar, ongkir: +r.ongkir, biaya: +r.biaya,
     total: +r.total, alamat: r.alamat || "", catatan: r.catatan || "",
     status: r.status, selesaiAt: r.selesai_at, createdAt: r.created_at, updatedAt: r.updated_at,
+    // kolom tambahan (lihat supabase-migration.sql)
+    member: !!r.member, diskon: +r.diskon || 0, prioritas: !!r.prioritas,
+    bayar: r.bayar || "Tunai", bayarStatus: r.bayar_status || "belum",
+    jarak: r.jarak != null ? +r.jarak : null,
+    lat: r.lat != null ? +r.lat : null, lng: r.lng != null ? +r.lng : null,
   });
 
   // objek tampilan -> kolom database (hanya field yang ada)
@@ -25,7 +33,12 @@ const OrdersAPI = (() => {
     harga: "harga", berat: "berat", parfum: "parfum", antar: "antar", ongkir: "ongkir",
     biaya: "biaya", total: "total", alamat: "alamat", catatan: "catatan",
     status: "status", createdAt: "created_at",
+    member: "member", diskon: "diskon", prioritas: "prioritas", bayar: "bayar",
+    bayarStatus: "bayar_status", jarak: "jarak", lat: "lat", lng: "lng",
   };
+  // field tambahan: kalau kolomnya belum ada di database, ringkasannya disimpan di catatan
+  const EXTRA = ["member", "diskon", "prioritas", "bayar", "bayarStatus", "jarak", "lat", "lng"];
+  const isMissingColumn = (e) => e && /column|schema cache/i.test(e.message || "");
   const toRow = (o) => {
     const r = {};
     Object.keys(MAP).forEach((k) => { if (o[k] !== undefined) r[MAP[k]] = o[k]; });
@@ -67,6 +80,21 @@ const OrdersAPI = (() => {
         row.user_id = uid || null;
       }
       const { data, error } = await supabaseClient.from("orders").insert(row).select().single();
+      if (error && isMissingColumn(error)) {
+        // Database belum dimigrasi: simpan tanpa kolom baru, ringkasan ditaruh di catatan
+        const plain = Object.assign({}, o);
+        EXTRA.forEach((k) => { delete plain[k]; });
+        const base = toRow(plain);
+        if (row.user_id !== undefined) base.user_id = row.user_id;
+        const meta = "[BestWash] Bayar: " + (o.bayar || "Tunai") + (o.member ? " | MEMBER (diskon " + o.diskon + "%, prioritas)" : "") + (o.jarak != null ? " | Jarak: " + o.jarak + " km" : "");
+        base.catatan = ((o.catatan || "") + "\n" + meta).trim();
+        const retry = await supabaseClient.from("orders").insert(base).select().single();
+        if (retry.error) throw retry.error;
+        await refresh();
+        const out = fromRow(retry.data);
+        EXTRA.forEach((k) => { if (o[k] !== undefined) out[k] = o[k]; });
+        return out;
+      }
       if (error) throw error;
       await refresh();
       return fromRow(data);
@@ -99,6 +127,56 @@ const OrdersAPI = (() => {
       const { error } = await supabaseClient.rpc("complete_order", { p_id: id });
       if (error) throw error;
       await refresh();
+    },
+  };
+})();
+
+// =====================================================================
+// MemberAPI -> membership pelanggan (diskon + prioritas)
+// Disimpan di tabel Supabase "memberships"; jika tabel belum dibuat,
+// otomatis memakai localStorage browser (lihat supabase-migration.sql).
+// =====================================================================
+const MemberAPI = (() => {
+  let cur = null;
+  const lsKey = (u) => "bestwash_member_" + String(u).toLowerCase();
+  return {
+    current: () => cur,
+    isActive: () => !!cur && new Date(cur.sampai) > new Date(),
+
+    async load(username) {
+      try {
+        const s = await BestWashAuth.getSession();
+        if (s) {
+          const { data, error } = await supabaseClient.from("memberships").select("*").eq("user_id", s.user.id).maybeSingle();
+          if (!error) { cur = data ? { mulai: data.mulai, sampai: data.sampai, metode: data.metode } : null; return cur; }
+          console.warn("[BestWash] Tabel memberships belum siap, pakai penyimpanan lokal:", error.message);
+        }
+      } catch (e) {}
+      try { const v = localStorage.getItem(lsKey(username)); cur = v ? JSON.parse(v) : null; } catch (e) { cur = null; }
+      return cur;
+    },
+
+    // Daftar / perpanjang MEMBER.hari hari
+    async join(username, metode) {
+      const now = new Date();
+      const aktif = this.isActive();
+      const start = aktif ? new Date(cur.sampai) : now;
+      const rec = {
+        mulai: aktif ? cur.mulai : now.toISOString(),
+        sampai: new Date(start.getTime() + MEMBER.hari * 864e5).toISOString(),
+        metode,
+      };
+      try {
+        const s = await BestWashAuth.getSession();
+        if (s) {
+          const { error } = await supabaseClient.from("memberships").upsert(Object.assign({ user_id: s.user.id, updated_at: now.toISOString() }, rec));
+          if (!error) { cur = rec; return rec; }
+          console.warn("[BestWash] Gagal simpan membership ke Supabase, pakai lokal:", error.message);
+        }
+      } catch (e) {}
+      try { localStorage.setItem(lsKey(username), JSON.stringify(rec)); } catch (e) {}
+      cur = rec;
+      return rec;
     },
   };
 })();
