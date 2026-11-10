@@ -191,9 +191,13 @@
               </button>
             </div>
             <div class="text-right mt-1">
-              <a href="#" class="text-xs text-white/90 hover:underline"
-                >Lupa Password</a
+              <button
+                type="button"
+                id="forgot-link"
+                class="text-xs text-white/90 hover:underline focus:outline-none"
               >
+                Lupa Password?
+              </button>
             </div>
           </div>
 
@@ -240,6 +244,107 @@
           class="fill-[#93E1E3]"
         ></path>
       </svg>
+    </div>
+
+    <!-- Modal Lupa Password (2 langkah: email -> kode + password baru) -->
+    <div
+      id="forgot-modal"
+      class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300"
+    >
+      <div
+        id="forgot-card"
+        class="bg-white rounded-3xl p-8 shadow-2xl w-[90%] max-w-sm transform scale-95 transition-all duration-300 text-black"
+      >
+        <!-- Langkah 1: masukkan email / username -->
+        <div id="forgot-step-1">
+          <h3 class="text-2xl font-extrabold text-[#1E90FF] text-center">
+            Lupa Password
+          </h3>
+          <p class="text-sm text-gray-500 text-center mt-2 mb-6">
+            Masukkan email atau username akunmu. Kami akan mengirim kode
+            verifikasi ke email.
+          </p>
+          <input
+            type="text"
+            id="forgot-id"
+            autocomplete="email"
+            placeholder="Email atau Username"
+            class="w-full bg-gray-100 text-black px-5 py-3 rounded-full text-sm font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#93E1E3]"
+          />
+          <p
+            id="forgot-error-1"
+            class="hidden text-red-600 text-xs font-semibold mt-3 text-center"
+          ></p>
+          <button
+            type="button"
+            id="btn-forgot-send"
+            class="w-full mt-5 bg-[#1E90FF] text-white font-bold py-3 rounded-full hover:bg-blue-600 transition duration-300"
+          >
+            Kirim Kode
+          </button>
+        </div>
+
+        <!-- Langkah 2: kode OTP + password baru -->
+        <div id="forgot-step-2" class="hidden">
+          <h3 class="text-2xl font-extrabold text-[#1E90FF] text-center">
+            Atur Password Baru
+          </h3>
+          <p class="text-sm text-gray-500 text-center mt-2 mb-6">
+            Kode verifikasi sudah dikirim ke
+            <span id="forgot-email-shown" class="font-bold text-gray-700"></span
+            >. Cek inbox/spam emailmu.
+          </p>
+          <input
+            type="text"
+            id="forgot-otp"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            maxlength="10"
+            placeholder="Kode verifikasi"
+            class="w-full bg-gray-100 text-black text-center tracking-widest px-5 py-3 rounded-full text-base font-bold placeholder-gray-400 placeholder:tracking-normal placeholder:font-medium placeholder:text-sm focus:outline-none focus:ring-2 focus:ring-[#93E1E3]"
+          />
+          <input
+            type="password"
+            id="forgot-new-password"
+            autocomplete="new-password"
+            placeholder="Password baru (min. 6 karakter)"
+            class="w-full mt-3 bg-gray-100 text-black px-5 py-3 rounded-full text-sm font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#93E1E3]"
+          />
+          <input
+            type="password"
+            id="forgot-confirm-password"
+            autocomplete="new-password"
+            placeholder="Ulangi password baru"
+            class="w-full mt-3 bg-gray-100 text-black px-5 py-3 rounded-full text-sm font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#93E1E3]"
+          />
+          <p
+            id="forgot-error-2"
+            class="hidden text-red-600 text-xs font-semibold mt-3 text-center"
+          ></p>
+          <button
+            type="button"
+            id="btn-forgot-reset"
+            class="w-full mt-5 bg-[#1E90FF] text-white font-bold py-3 rounded-full hover:bg-blue-600 transition duration-300"
+          >
+            Simpan Password Baru
+          </button>
+          <button
+            type="button"
+            id="btn-forgot-resend"
+            class="w-full mt-3 text-xs text-gray-500 hover:text-[#1E90FF] focus:outline-none"
+          >
+            Kirim ulang kode
+          </button>
+        </div>
+
+        <button
+          type="button"
+          id="btn-forgot-close"
+          class="w-full mt-2 text-xs text-gray-400 hover:text-gray-600 focus:outline-none"
+        >
+          Batal
+        </button>
+      </div>
     </div>
 
     <!-- Supabase (CDN) + konfigurasi + logika halaman -->
