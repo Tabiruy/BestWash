@@ -55,6 +55,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return "Password baru tidak boleh sama dengan password lama.";
     if (msg.includes("rate limit") || msg.includes("security purposes"))
       return "Terlalu banyak percobaan. Tunggu sebentar lalu coba lagi.";
+    if (msg.includes("rate limit"))
+      return "Terlalu banyak percobaan. Tunggu beberapa menit lalu coba lagi.";
     if (msg.includes("failed to fetch"))
       return "Tidak bisa terhubung ke server. Periksa koneksi internetmu.";
     if (msg.includes("get_email_by_username"))

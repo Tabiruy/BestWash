@@ -350,6 +350,12 @@ tailwind.config = {
           <td class="${TD} font-semibold">${esc(o.id)}${o.prioritas ? ' <span class="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">' + (o.memberTier ? esc(tierOf(o.memberTier).nama.toUpperCase()) : 'PRIORITAS') + '</span>' : ''}<div class="text-xs font-normal text-slate-500">${fmtDT(o.createdAt)}</div></td>
           <td class="${TD}">${esc(o.nama)}<div class="text-xs text-slate-500">${esc(o.hp)}</div></td>
           <td class="${TD}">${esc(o.paket)}<div class="text-xs ${o.berat > 0 ? 'text-slate-500' : 'font-semibold text-amber-600'}">${o.berat > 0 ? o.berat + ' kg' : 'belum ditimbang'}${o.antar ? ' · antar-jemput' + (o.jarak != null ? ' (' + o.jarak + ' km)' : '') : ''}</div><div class="text-xs text-slate-500">${o.member ? 'Member -' + o.diskon + '% · ' : ''}${o.voucherPersen > 0 ? 'Voucher -' + o.voucherPersen + '% · ' : ''}${esc(o.bayar)} · ${o.bayarStatus === 'lunas' ? '<b class="text-emerald-600">lunas</b>' : 'belum bayar'}</div></td>
+        const pri = (o) => (o.prioritas && o.status < 5 ? 1 : 0);
+        rows.sort((a, b) => pri(b) - pri(a));   // member (prioritas) dikerjakan lebih dulu
+        $('tbl-pesanan').innerHTML = table(['Pesanan', 'Pelanggan', 'Layanan', 'Total', 'Status', 'Aksi'], rows.map((o) => `<tr>
+          <td class="${TD} font-semibold">${esc(o.id)}${o.prioritas ? ' <span class="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">PRIORITAS</span>' : ''}<div class="text-xs font-normal text-slate-500">${fmtDT(o.createdAt)}</div></td>
+          <td class="${TD}">${esc(o.nama)}<div class="text-xs text-slate-500">${esc(o.hp)}</div></td>
+          <td class="${TD}">${esc(o.paket)}<div class="text-xs ${o.berat > 0 ? 'text-slate-500' : 'font-semibold text-amber-600'}">${o.berat > 0 ? o.berat + ' kg' : 'belum ditimbang'}${o.antar ? ' · antar-jemput' + (o.jarak != null ? ' (' + o.jarak + ' km)' : '') : ''}</div><div class="text-xs text-slate-500">${o.member ? 'Member -' + o.diskon + '% · ' : ''}${esc(o.bayar)} · ${o.bayarStatus === 'lunas' ? '<b class="text-emerald-600">lunas</b>' : 'belum bayar'}</div></td>
           <td class="${TD} font-semibold">${rp(o.total)}</td>
           <td class="${TD}"><select data-act="status" data-id="${esc(o.id)}" aria-label="Status ${esc(o.id)}" class="rounded-lg border-0 py-1.5 pl-3 pr-8 text-xs font-bold ${BADGE[o.status]}">${STATUS.map((s, i) => `<option value="${i}"${i === o.status ? ' selected' : ''}>${esc(s)}</option>`).join('')}</select></td>
           <td class="${TD} whitespace-nowrap">${o.berat > 0 ? '' : `<button type="button" data-act="timbang" data-id="${esc(o.id)}" class="${BTN}border-amber-300 text-amber-700 hover:bg-amber-50">Timbang</button> `}${o.bayarStatus === 'lunas' ? '' : `<button type="button" data-act="lunas" data-id="${esc(o.id)}" class="${BTN}border-emerald-300 text-emerald-700 hover:bg-emerald-50">Lunas</button> `}<button type="button" data-act="edit" data-id="${esc(o.id)}" class="${BTN}border-heading/30 text-heading hover:bg-brand/10">Edit</button> <button type="button" data-act="del" data-id="${esc(o.id)}" class="${BTN}border-rose-300 text-rose-600 hover:bg-rose-50">Hapus</button></td></tr>`), 'Tidak ada pesanan yang cocok.');
@@ -388,6 +394,7 @@ tailwind.config = {
         const setelahDiskon = Math.round(biaya * (1 - diskon / 100));
         const voucher = Math.round(setelahDiskon * (old ? old.voucherPersen || 0 : 0) / 100);   // voucher hasil tukar poin (%), setelah diskon member
         return { svc, harga, berat, ongkir, biaya, voucher, total: setelahDiskon - voucher + ongkir };
+        return { svc, harga, berat, ongkir, biaya, total: Math.round(biaya * (1 - diskon / 100)) + ongkir };
       }
       function paintTotal() {
         const c = orderTotal();

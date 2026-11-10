@@ -26,6 +26,7 @@ const VOUCHERS = [
   { poin: 2000, persen: 20 },
   { poin: 2500, persen: 30 },
 ];
+const MEMBER = { fee: 30000, hari: 30, diskon: 10 };
 
 const OrdersAPI = (() => {
   let cache = [], sig = "", started = false;
@@ -61,6 +62,9 @@ const OrdersAPI = (() => {
   };
   // field tambahan: kalau kolomnya belum ada di database, ringkasannya disimpan di catatan
   const EXTRA = ["member", "diskon", "prioritas", "bayar", "bayarStatus", "jarak", "lat", "lng", "voucherPersen", "voucherId", "memberTier", "bonusPoin"];
+  };
+  // field tambahan: kalau kolomnya belum ada di database, ringkasannya disimpan di catatan
+  const EXTRA = ["member", "diskon", "prioritas", "bayar", "bayarStatus", "jarak", "lat", "lng"];
   const isMissingColumn = (e) => e && /column|schema cache/i.test(e.message || "");
   const toRow = (o) => {
     const r = {};
@@ -110,6 +114,7 @@ const OrdersAPI = (() => {
         const base = toRow(plain);
         if (row.user_id !== undefined) base.user_id = row.user_id;
         const meta = "[BestWash] Bayar: " + (o.bayar || "Tunai") + (o.member ? " | MEMBER " + tierOf(o.memberTier).nama + " (diskon " + o.diskon + "%, bonus poin +" + (o.bonusPoin || 0) + "%, prioritas)" : "") + (o.voucherPersen > 0 ? " | VOUCHER " + o.voucherPersen + "%" : "") + (o.jarak != null ? " | Jarak: " + o.jarak + " km" : "");
+        const meta = "[BestWash] Bayar: " + (o.bayar || "Tunai") + (o.member ? " | MEMBER (diskon " + o.diskon + "%, prioritas)" : "") + (o.jarak != null ? " | Jarak: " + o.jarak + " km" : "");
         base.catatan = ((o.catatan || "") + "\n" + meta).trim();
         const retry = await supabaseClient.from("orders").insert(base).select().single();
         if (retry.error) throw retry.error;
@@ -174,6 +179,7 @@ const MemberAPI = (() => {
         if (s) {
           const { data, error } = await supabaseClient.from("memberships").select("*").eq("user_id", s.user.id).maybeSingle();
           if (!error) { cur = data ? { mulai: data.mulai, sampai: data.sampai, metode: data.metode, tier: data.tier || "bronze" } : null; return cur; }
+          if (!error) { cur = data ? { mulai: data.mulai, sampai: data.sampai, metode: data.metode } : null; return cur; }
           console.warn("[BestWash] Tabel memberships belum siap, pakai penyimpanan lokal:", error.message);
         }
       } catch (e) {}
@@ -193,6 +199,18 @@ const MemberAPI = (() => {
         mulai: sama ? cur.mulai : now.toISOString(),
         sampai: new Date(start.getTime() + MEMBER.hari * 864e5).toISOString(),
         metode, tier,
+      return cur;
+    },
+
+    // Daftar / perpanjang MEMBER.hari hari
+    async join(username, metode) {
+      const now = new Date();
+      const aktif = this.isActive();
+      const start = aktif ? new Date(cur.sampai) : now;
+      const rec = {
+        mulai: aktif ? cur.mulai : now.toISOString(),
+        sampai: new Date(start.getTime() + MEMBER.hari * 864e5).toISOString(),
+        metode,
       };
       try {
         const s = await BestWashAuth.getSession();
