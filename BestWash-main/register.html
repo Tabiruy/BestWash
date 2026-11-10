@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BestWash - Sign Up</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-[#93E1E3] min-h-screen flex flex-col justify-between relative overflow-x-hidden"
+  >
+    <!-- Navbar Fixed & Responsive (Tanpa Tombol Log-in) -->
+    <nav
+      class="fixed top-0 left-0 right-0 z-50 bg-[#F4FDFC]/20 backdrop-blur-md border-b border-white/30 shadow-sm py-4 px-6 md:px-12"
+    >
+      <div class="flex items-center justify-between">
+        <a
+          href="landing_page.html"
+          class="text-2xl md:text-3xl font-bold text-left text-black"
+          >BestWash</a
+        >
+
+        <!-- Desktop Menu -->
+        <ul class="hidden md:flex items-center gap-8 text-black">
+          <a
+            href="landing_page.html"
+            class="text-base font-regular hover:underline underline-offset-5 inline-block"
+            >Home</a
+          >
+          <a
+            href="landing_page.html#services"
+            class="text-base font-regular hover:underline underline-offset-5 inline-block"
+            >Services</a
+          >
+          <a
+            href="landing_page.html#price"
+            class="text-base font-regular hover:underline underline-offset-5 inline-block"
+            >Price</a
+          >
+          <a
+            href="landing_page.html#contact"
+            class="text-base font-regular hover:underline underline-offset-5 inline-block"
+            >Contact Us</a
+          >
+        </ul>
+
+        <!-- Mobile Hamburger Button -->
+        <button
+          id="menu-btn"
+          class="block md:hidden text-black focus:outline-none p-2"
+          aria-label="Toggle Menu"
+        >
+          <svg
+            class="w-8 h-8"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 6h16M4 12h16M4 18h16"
+            ></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Mobile Dropdown Menu (Tanpa Tombol Log-in) -->
+      <div
+        id="mobile-menu"
+        class="hidden md:hidden flex-col gap-4 mt-4 pt-4 border-t border-white/20 text-black"
+      >
+        <a
+          href="landing_page.html"
+          class="text-base font-regular hover:underline underline-offset-5 block"
+          >Home</a
+        >
+        <a
+          href="landing_page.html#services"
+          class="text-base font-regular hover:underline underline-offset-5 block"
+          >Services</a
+        >
+        <a
+          href="landing_page.html#price"
+          class="text-base font-regular hover:underline underline-offset-5 block"
+          >Price</a
+        >
+        <a
+          href="landing_page.html#contact"
+          class="text-base font-regular hover:underline underline-offset-5 block"
+          >Contact Us</a
+        >
+      </div>
+    </nav>
+
+    <!-- Main Content: Register Form Card -->
+    <main
+      class="flex-grow flex items-center justify-center pt-28 pb-36 px-4 z-10"
+    >
+      <div
+        class="bg-[#F4FDFC]/20 backdrop-blur-md border border-white/30 shadow-sm rounded-3xl p-8 md:p-10 w-full max-w-md text-white"
+      >
+        <p class="text-xs md:text-sm font-medium mb-1 opacity-90">
+          Create Account
+        </p>
+        <h2 class="text-3xl md:text-4xl font-extrabold mb-6">Sign Up</h2>
+
+        <form id="register-form" action="#" method="POST" class="space-y-4">
+          <!-- Username Input -->
+          <div>
+            <label class="block text-base font-bold mb-1">Username</label>
+            <input
+              type="text"
+              id="username"
+              autocomplete="username"
+              placeholder="Masukkan Username"
+              class="w-full bg-white text-black px-4 py-2.5 rounded-full text-sm font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#93E1E3]"
+              required
+            />
+          </div>
+
+          <!-- Email Input -->
+          <div>
+            <label class="block text-base font-bold mb-1">Email</label>
+            <input
+              type="email"
+              id="email"
+              autocomplete="email"
+              placeholder="Masukkan Email"
+              class="w-full bg-white text-black px-4 py-2.5 rounded-full text-sm font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#93E1E3]"
+              required
+            />
+          </div>
+
+          <!-- Password Input -->
+          <div>
+            <label class="block text-base font-bold mb-1">Password</label>
+            <input
+              type="password"
+              id="password"
+              autocomplete="new-password"
+              placeholder="Masukkan Password"
+              class="w-full bg-white text-black px-4 py-2.5 rounded-full text-sm font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#93E1E3]"
+              required
+            />
+          </div>
+
+          <!-- No. Telp Input -->
+          <div>
+            <label class="block text-base font-bold mb-1">No. Telp</label>
+            <input
+              type="tel"
+              id="telp"
+              autocomplete="tel"
+              placeholder="Masukkan No. Telp"
+              class="w-full bg-white text-black px-4 py-2.5 rounded-full text-sm font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#93E1E3]"
+              required
+            />
+          </div>
+
+          <!-- Kotak pesan error/sukses (diisi oleh auth.js) -->
+          <div id="auth-alert" role="alert" class="hidden"></div>
+
+          <!-- Submit Button -->
+          <div class="pt-4">
+            <button
+              type="submit"
+              class="w-full bg-white text-[#1E90FF] font-extrabold text-lg py-3 rounded-full hover:bg-gray-100 transition duration-300 shadow-md"
+            >
+              Sign Up
+            </button>
+          </div>
+
+          <!-- Login Link -->
+          <div class="text-center text-xs mt-3">
+            <p class="text-white/80">
+              Sudah Punya Akun?
+              <a
+                href="login.html"
+                class="font-bold text-white hover:underline ml-1"
+                >Sign In</a
+              >
+            </p>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <!-- Wave Bottom -->
+    <div
+      class="absolute bottom-0 left-0 w-full leading-none overflow-hidden z-0"
+    >
+      <svg
+        class="relative block w-full h-[80px] md:h-[140px]"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 1200 120"
+        preserveAspectRatio="none"
+      >
+        <path
+          d="M0,0 C150,90 350,120 600,60 C850,0 1050,30 1200,90 L1200,120 L0,120 Z"
+          class="fill-[#1E90FF]"
+        ></path>
+      </svg>
+    </div>
+
+    <!-- Pop-up OTP Modal (Hidden by default) -->
+    <div
+      id="otp-modal"
+      class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300"
+    >
+      <div
+        id="otp-card"
+        class="bg-white rounded-3xl p-8 shadow-2xl w-[90%] max-w-sm transform scale-95 transition-all duration-300"
+      >
+        <div class="text-center">
+          <div
+            class="mx-auto w-16 h-16 bg-[#93E1E3]/30 text-[#1E90FF] rounded-full flex items-center justify-center mb-4"
+          >
+            <svg
+              class="w-8 h-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+              ></path>
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-900 mb-2">Cek Email Kamu</h3>
+          <p class="text-sm text-gray-500 mb-6">
+            Kami telah mengirimkan 8 digit kode unik. Masukkan kode tersebut di
+            bawah ini untuk mengaktifkan akunmu.
+          </p>
+
+          <input
+            type="text"
+            id="otp-input"
+            maxlength="8"
+            inputmode="numeric"
+            placeholder="--------"
+            class="w-full text-center text-2xl tracking-[0.5em] font-bold bg-gray-50 border border-gray-200 text-black py-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1E90FF]"
+          />
+          <p
+            id="otp-error"
+            class="text-red-500 text-xs font-semibold mt-2 hidden"
+          >
+            Kode OTP salah atau kedaluwarsa.
+          </p>
+
+          <button
+            type="button"
+            id="btn-verify-otp"
+            class="mt-6 w-full bg-[#1E90FF] text-white font-bold text-lg py-3 rounded-full hover:bg-blue-600 transition shadow-md"
+          >
+            Verifikasi & Buat Akun
+          </button>
+          <p class="text-xs text-gray-400 mt-4">
+            Klik area gelap di luar kotak ini untuk menutup.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Supabase (CDN) + konfigurasi + logika halaman -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="auth.js"></script>
+
+    <!-- Panggil File JavaScript Utama -->
+    <script src="script.js"></script>
+  </body>
+</html>
