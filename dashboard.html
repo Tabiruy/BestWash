@@ -98,10 +98,6 @@ tailwind.config = {
         </article>
         <article class="overflow-hidden rounded-2xl border border-white/60 shadow-md">
           <div class="flex items-center justify-between gap-3 bg-white/85 px-5 py-4">
-            <div><p class="text-[11px] font-bold tracking-wide text-navy">POIN REWARDS</p><div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1"><p class="text-3xl font-bold text-heading"><span data-stat="poin">0</span> <span class="text-sm font-medium text-navy">Poin</span></p><button type="button" id="btn-tukar" class="rounded-full bg-navy px-3 py-1 text-xs font-bold text-white transition hover:bg-[#093a63] focus:outline-none focus-visible:ring-4 focus-visible:ring-brand/30">Tukar</button></div></div>
-            <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand/15 text-heading"><svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg></span>
-          </div>
-          <p id="poin-foot" class="bg-nav px-5 py-2 text-xs font-semibold text-white">Tukar poin jadi voucher diskon</p>
             <div><p class="text-[11px] font-bold tracking-wide text-navy">POIN REWARDS</p><p class="mt-1 text-3xl font-bold text-heading"><span data-stat="poin">0</span> <span class="text-sm font-medium text-navy">Poin</span></p></div>
             <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand/15 text-heading"><svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg></span>
           </div>
@@ -141,12 +137,6 @@ tailwind.config = {
             <div id="bayar-online" class="mt-3 hidden"><label for="bayar-via" class="block text-xs font-bold text-navy">Saluran pembayaran online</label><select id="bayar-via" class="mt-1 h-11 w-full rounded-xl border border-slate-300 bg-white px-4 text-sm text-black placeholder:text-gray-400 focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/20"><option value="QRIS">QRIS</option><option value="Transfer Bank">Transfer Bank</option><option value="E-Wallet">E-Wallet (GoPay / OVO / DANA)</option></select><p class="mt-1 text-xs text-slate-500">Karena berat belum diketahui, pembayaran online dilakukan setelah cucian ditimbang. Instruksi pembayaran ada di struk.</p></div>
           </fieldset>
 
-          <fieldset id="voucher-box" class="mt-6 hidden"><legend class="text-sm font-bold text-navy">6. Voucher diskon (opsional)</legend><label for="voucher-pilih" class="sr-only">Pilih voucher</label><select id="voucher-pilih" class="mt-2 h-11 w-full rounded-xl border border-slate-300 bg-white px-4 text-sm text-black focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/20"><option value="">Tanpa voucher</option></select><p class="mt-1 text-xs text-slate-500">Voucher memotong biaya cucian setelah ditimbang, setelah diskon member. Ongkos antar-jemput tidak dipotong.</p></fieldset>
-
-          <div class="mt-6 rounded-2xl bg-gradient-to-br from-[#0b4a7d] to-[#06304f] p-5 text-white">
-            <div class="flex justify-between text-sm"><span class="text-cyan-200">Ongkos Antar-Jemput:</span><span class="font-bold" data-sum="ongkir">Rp 0</span></div>
-            <div id="row-diskon" class="mt-1 hidden justify-between text-sm"><span class="text-cyan-200">Diskon Member:</span><span class="font-bold" data-diskon-label>10% dari biaya cucian</span></div>
-            <div id="row-voucher" class="mt-1 hidden justify-between text-sm"><span class="text-cyan-200">Voucher Diskon:</span><span class="font-bold" data-voucher-label></span></div>
           <div class="mt-6 rounded-2xl bg-gradient-to-br from-[#0b4a7d] to-[#06304f] p-5 text-white">
             <div class="flex justify-between text-sm"><span class="text-cyan-200">Ongkos Antar-Jemput:</span><span class="font-bold" data-sum="ongkir">Rp 0</span></div>
             <div id="row-diskon" class="mt-1 hidden justify-between text-sm"><span class="text-cyan-200">Diskon Member:</span><span class="font-bold" data-diskon-label>10% dari biaya cucian</span></div>
@@ -189,7 +179,6 @@ tailwind.config = {
 
       <!-- BANTUAN -->
       <section data-panel="bantuan" class="hidden grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
-        <div class="rounded-2xl bg-white/95 p-5 shadow-lg sm:p-6 space-y-3"><h2 class="text-xl font-bold text-heading">Pertanyaan Umum</h2><details class="group rounded-xl border border-slate-200 p-4"><summary class="cursor-pointer list-none text-sm font-bold text-heading marker:hidden">Bagaimana memantau status cucian?</summary><p class="mt-2 text-sm text-slate-600">Buka menu Status Laundry. Tahapnya diperbarui otomatis setiap kali admin mengubah status pesananmu.</p></details><details class="group rounded-xl border border-slate-200 p-4"><summary class="cursor-pointer list-none text-sm font-bold text-heading marker:hidden">Apakah berat cucian bisa berubah?</summary><p class="mt-2 text-sm text-slate-600">Berat tidak perlu kamu isi. Cucian ditimbang oleh tim BestWash saat diterima, lalu biaya dihitung sesuai tarif per kg dan muncul di Status Laundry.</p></details><details class="group rounded-xl border border-slate-200 p-4"><summary class="cursor-pointer list-none text-sm font-bold text-heading marker:hidden">Bagaimana memakai layanan antar-jemput?</summary><p class="mt-2 text-sm text-slate-600">Tandai lokasimu di peta pada formulir pemesanan. Jika jarak ke gerai maksimal 5 km, opsi antar-jemput aktif dan kurir BestWash menjemput serta mengantar cucianmu. Jika lebih dari 5 km, antar dan ambil cucian langsung ke gerai.</p></details><details class="group rounded-xl border border-slate-200 p-4"><summary class="cursor-pointer list-none text-sm font-bold text-heading marker:hidden">Bagaimana poin rewards dihitung?</summary><p class="mt-2 text-sm text-slate-600">Setiap pesanan yang selesai memberi 1 poin untuk tiap Rp1.000 total pesanan. Member Silver dan Gold mendapat bonus poin tambahan. Poin bisa ditukar jadi voucher diskon (1.000 poin = 10%, 2.000 poin = 20%, 2.500 poin = 30%) lewat tombol Tukar di kartu Poin Rewards.</p></details><details class="group rounded-xl border border-slate-200 p-4"><summary class="cursor-pointer list-none text-sm font-bold text-heading marker:hidden">Apa keuntungan membership?</summary><p class="mt-2 text-sm text-slate-600">Ada tiga paket: Bronze (diskon 10%), Silver (diskon 15%, bonus poin +25%, prioritas tinggi), dan Gold (diskon 20%, bonus poin +50%, prioritas utama). Daftar lewat menu Membership.</p></details></div>
         <div class="rounded-2xl bg-white/95 p-5 shadow-lg sm:p-6 space-y-3"><h2 class="text-xl font-bold text-heading">Pertanyaan Umum</h2><details class="group rounded-xl border border-slate-200 p-4"><summary class="cursor-pointer list-none text-sm font-bold text-heading marker:hidden">Bagaimana memantau status cucian?</summary><p class="mt-2 text-sm text-slate-600">Buka menu Status Laundry. Tahapnya diperbarui otomatis setiap kali admin mengubah status pesananmu.</p></details><details class="group rounded-xl border border-slate-200 p-4"><summary class="cursor-pointer list-none text-sm font-bold text-heading marker:hidden">Apakah berat cucian bisa berubah?</summary><p class="mt-2 text-sm text-slate-600">Berat tidak perlu kamu isi. Cucian ditimbang oleh tim BestWash saat diterima, lalu biaya dihitung sesuai tarif per kg dan muncul di Status Laundry.</p></details><details class="group rounded-xl border border-slate-200 p-4"><summary class="cursor-pointer list-none text-sm font-bold text-heading marker:hidden">Bagaimana memakai layanan antar-jemput?</summary><p class="mt-2 text-sm text-slate-600">Tandai lokasimu di peta pada formulir pemesanan. Jika jarak ke gerai maksimal 5 km, opsi antar-jemput aktif dan kurir BestWash menjemput serta mengantar cucianmu. Jika lebih dari 5 km, antar dan ambil cucian langsung ke gerai.</p></details><details class="group rounded-xl border border-slate-200 p-4"><summary class="cursor-pointer list-none text-sm font-bold text-heading marker:hidden">Bagaimana poin rewards dihitung?</summary><p class="mt-2 text-sm text-slate-600">Setiap pesanan yang selesai memberi 1 poin untuk tiap Rp1.000 total pesanan.</p></details><details class="group rounded-xl border border-slate-200 p-4"><summary class="cursor-pointer list-none text-sm font-bold text-heading marker:hidden">Apa keuntungan membership?</summary><p class="mt-2 text-sm text-slate-600">Member mendapat diskon 10% untuk biaya cucian dan pesanannya diprioritaskan (dikerjakan lebih dulu). Daftar lewat menu Membership.</p></details></div>
         <div class="rounded-2xl bg-white/95 p-5 shadow-lg sm:p-6"><h2 class="text-xl font-bold text-heading">Kontak BestWash</h2>
           <dl class="mt-3 space-y-3 text-sm"><div><dt class="font-bold text-navy">WhatsApp</dt><dd class="text-slate-600" data-set="telp">0812-3456-7890</dd></div><div><dt class="font-bold text-navy">Jam Buka</dt><dd class="text-slate-600" data-set="jam">Setiap hari, 07.00 - 21.00</dd></div><div><dt class="font-bold text-navy">Alamat</dt><dd class="text-slate-600" data-set="alamat">Jl. Contoh No. 123, Kota Anda</dd></div></dl>
@@ -213,20 +202,6 @@ tailwind.config = {
     <svg viewBox="0 0 1440 260" preserveAspectRatio="none" class="h-40 w-full md:h-56" xmlns="http://www.w3.org/2000/svg">
       <path fill="#97E3E3" d="M0 90 C 260 10, 520 10, 760 70 S 1200 190, 1440 40 L1440 260 L0 260 Z" />
     </svg>
-  </div>
-
-  <!-- Modal tukar poin -> voucher diskon -->
-  <div id="dlg-voucher" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/50 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="voucher-title">
-    <div class="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
-      <div class="flex items-start justify-between gap-3">
-        <div><h2 id="voucher-title" class="text-xl font-bold text-heading">Tukar Poin</h2><p class="text-sm text-slate-500">Saldo poinmu: <b class="text-heading" data-stat="poin">0</b> poin</p></div>
-        <button type="button" id="voucher-tutup" aria-label="Tutup" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition hover:bg-slate-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-brand/30"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-      </div>
-      <div id="voucher-opsi" class="mt-4 space-y-3"></div>
-      <h3 class="mt-6 text-sm font-bold text-navy">Voucher Saya</h3>
-      <div id="voucher-saya" class="mt-2 space-y-2"></div>
-      <p class="mt-4 rounded-xl bg-slate-50 p-3 text-xs text-slate-500">Voucher dipilih di formulir pemesanan dan memotong biaya cucian setelah ditimbang, dihitung setelah diskon member (ongkos antar-jemput tidak dipotong). Satu voucher berlaku untuk satu pesanan.</p>
-    </div>
   </div>
 
   <script>
@@ -328,11 +303,6 @@ tailwind.config = {
         const antar = q('[name="antar_jemput"]').checked && inRange();
         const ongkir = antar ? settings.ongkir : 0;
         const online = q('input[name="bayar"]:checked').value === 'online';
-        const mt = MemberAPI.tier(), member = !!mt;
-        // Berat belum diketahui -> total sementara hanya ongkir. Biaya cucian dihitung kasir saat penimbangan.
-        const vSel = q('#voucher-pilih');
-        const vch = vSel && vSel.value ? VoucherAPI.active().find((v) => v.id === vSel.value) : null;
-        return { svc, antar, ongkir, total: ongkir, member, diskon: mt ? mt.diskon : 0, tier: mt ? mt.id : '', bonusPoin: mt ? mt.bonusPoin : 0, online, bayar: online ? q('#bayar-via').value : 'Tunai', voucher: vch ? vch.persen : 0, voucherId: vch ? vch.id : '' };
         const member = MemberAPI.isActive();
         // Berat belum diketahui -> total sementara hanya ongkir. Biaya cucian dihitung kasir saat penimbangan.
         return { svc, antar, ongkir, total: ongkir, member, diskon: member ? MEMBER.diskon : 0, online, bayar: online ? q('#bayar-via').value : 'Tunai' };
@@ -357,21 +327,6 @@ tailwind.config = {
         set('ongkir', rp(c.ongkir)); set('total', rp(c.total));
         set('caption', c.svc ? 'Biaya cucian dihitung setelah penimbangan (' + rp(c.svc.harga) + '/kg ' + c.svc.nama + ')' : 'Pilih paket cucian');
         const rd = q('#row-diskon'); rd.classList.toggle('hidden', !c.member); rd.classList.toggle('flex', c.member);
-        q('[data-diskon-label]').textContent = c.diskon + '% dari biaya cucian';
-        { const mt = MemberAPI.tier(); q('#member-banner').innerHTML = mt ? '<b class="text-emerald-700">Member ' + mt.nama + ' aktif</b> - diskon ' + mt.diskon + '%' + (mt.bonusPoin ? ', bonus poin +' + mt.bonusPoin + '%' : '') + ' &amp; ' + mt.prioLabel.toLowerCase() + '.' : 'Belum member? <a href="#membership" class="font-bold text-heading underline">Pilih membership</a> untuk diskon, bonus poin &amp; prioritas laundry.'; }
-        // voucher: isi pilihan dari voucher aktif milik user
-        const vSel = q('#voucher-pilih');
-        if (vSel) {
-          const act = VoucherAPI.active(), sig = act.map((v) => v.id).join(',');
-          if (vSel.dataset.sig !== sig) {
-            const keep = vSel.value;
-            vSel.innerHTML = '<option value="">Tanpa voucher</option>' + act.map((v) => '<option value="' + esc(v.id) + '">Voucher diskon ' + v.persen + '% (' + v.poin + ' poin)</option>').join('');
-            vSel.value = act.some((v) => v.id === keep) ? keep : ''; vSel.dataset.sig = sig;
-          }
-          q('#voucher-box').classList.toggle('hidden', !act.length);
-        }
-        const rv = q('#row-voucher'); rv.classList.toggle('hidden', !(c.voucher > 0)); rv.classList.toggle('flex', c.voucher > 0);
-        q('[data-voucher-label]').textContent = c.voucher + '% dari biaya cucian';
         q('[data-diskon-label]').textContent = MEMBER.diskon + '% dari biaya cucian';
         q('#member-banner').innerHTML = c.member ? '<b class="text-emerald-700">Member aktif</b> - diskon ' + MEMBER.diskon + '% &amp; pesanan diprioritaskan.' : 'Belum member? <a href="#membership" class="font-bold text-heading underline">Daftar membership</a> untuk diskon ' + MEMBER.diskon + '% &amp; prioritas.';
         q('#bayar-online').classList.toggle('hidden', !c.online);
@@ -451,20 +406,12 @@ tailwind.config = {
         if (st.busy) { alert('Jarak masih dihitung, tunggu sebentar lalu konfirmasi lagi.'); return; }
         const v = (s) => { const el = q(s); return el ? el.value.trim() : ''; };
         const me = Auth.get();
-        let nilaiVoucher = 0;
-        if (c.voucherId) {
-          try { nilaiVoucher = await VoucherAPI.use(c.voucherId, me); } catch (err) { paint(); return alert('Voucher tidak bisa dipakai: ' + (err.message || err)); }
-        }
         let order;
         try {
           order = await OrdersAPI.create({
             user: me, nama: v('#nama') || me, hp: v('#hp'), paketId: c.svc.id, paket: c.svc.nama, harga: c.svc.harga,
             berat: 0, biaya: 0, parfum: v('#parfum'), antar: c.antar, ongkir: c.ongkir, total: c.total,
             alamat: v('#alamat'), catatan: v('#catatan'),
-            member: c.member, diskon: c.diskon, prioritas: c.member, bayar: c.bayar, bayarStatus: 'belum', voucherPersen: nilaiVoucher, voucherId: c.voucherId, memberTier: c.tier, bonusPoin: c.bonusPoin,
-            jarak: st.jarak != null ? Math.round(st.jarak * 10) / 10 : null, lat: st.pt ? st.pt.lat : null, lng: st.pt ? st.pt.lng : null,
-          });
-        } catch (err) { if (c.voucherId) await VoucherAPI.release(c.voucherId, me); paint(); return alert('Gagal mengirim pesanan: ' + (err.message || err)); }
             member: c.member, diskon: c.diskon, prioritas: c.member, bayar: c.bayar, bayarStatus: 'belum',
             jarak: st.jarak != null ? Math.round(st.jarak * 10) / 10 : null, lat: st.pt ? st.pt.lat : null, lng: st.pt ? st.pt.lng : null,
           });
@@ -489,14 +436,12 @@ tailwind.config = {
         status: ['Status Laundry', 'Pantau tahap pengerjaan cucianmu. Diperbarui otomatis.'],
         riwayat: ['Riwayat Transaksi', 'Pesanan yang sudah selesai tersimpan di sini.'],
         tarif: ['Layanan & Tarif', 'Pilih paket yang sesuai, lalu langsung pesan.'],
-        membership: ['Membership', 'Pilih Bronze, Silver, atau Gold: diskon, bonus poin, dan prioritas cucian.'],
         membership: ['Membership', 'Diskon 10% dan prioritas cucian untuk pelanggan setia.'],
         profil: ['Profil & Alamat', 'Data ini dipakai untuk mengisi formulir pemesanan otomatis.'],
         bantuan: ['Bantuan CS', 'Pertanyaan umum dan kontak BestWash.'],
       };
       const fmt = (iso) => new Date(iso).toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }).replace(',', '') + ' WIB';
       const fmtD = (iso) => new Date(iso).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
-      let showAll = false, first = true, earnedPoin = 0;
       let showAll = false, first = true;
 
       document.querySelectorAll('[data-user]').forEach((el) => { el.textContent = me; });
@@ -528,7 +473,6 @@ tailwind.config = {
         return `<li class="relative flex gap-3 ${last ? '' : 'pb-5 after:absolute after:left-[17px] after:top-9 after:h-[calc(100%-2.25rem)] after:w-0.5 after:bg-slate-200'}"><span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${circle}"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icon}</svg></span><div class="min-w-0"><p class="text-sm font-bold ${cur ? 'text-heading' : done ? 'text-slate-800' : 'text-slate-400'}">${esc(TITLES[i])}</p><p class="text-xs ${done || cur ? 'text-slate-500' : 'text-slate-400'}">${esc(desc)}</p></div></li>`;
       }
       const berat = (o) => (o.berat > 0 ? o.berat + ' kg' : 'berat menyusul');
-      const head = (o) => `<div class="flex items-start justify-between gap-3"><div class="min-w-0"><p class="text-sm font-extrabold text-heading">#${esc(o.id)}${o.prioritas ? ' <span class="ml-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">' + (o.memberTier ? esc(tierOf(o.memberTier).nama.toUpperCase()) : 'PRIORITAS') + '</span>' : ''}</p><p class="text-xs text-slate-500">${esc(o.paket)} · ${berat(o)} · ${rp(o.total)}</p></div><span class="shrink-0 rounded-full px-3 py-1 text-xs font-bold ${BADGE[o.status]}">${esc(STATUS[o.status])}</span></div>`;
       const head = (o) => `<div class="flex items-start justify-between gap-3"><div class="min-w-0"><p class="text-sm font-extrabold text-heading">#${esc(o.id)}${o.prioritas ? ' <span class="ml-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">PRIORITAS</span>' : ''}</p><p class="text-xs text-slate-500">${esc(o.paket)} · ${berat(o)} · ${rp(o.total)}</p></div><span class="shrink-0 rounded-full px-3 py-1 text-xs font-bold ${BADGE[o.status]}">${esc(STATUS[o.status])}</span></div>`;
       const isOnline = (o) => o.bayar && o.bayar !== 'Tunai';
       const payLine = (o) => o.bayarStatus === 'lunas'
@@ -542,11 +486,6 @@ tailwind.config = {
 
       function renderAll() {
         const all = mine(), active = all.filter((o) => o.status < 5), done = all.filter((o) => o.status === 5);
-        const stat = { proses: all.filter((o) => o.status <= 3).length, siap: all.filter((o) => o.status === 4).length, selesai: done.length, poin: 0 };
-        earnedPoin = done.reduce((t, o) => t + poinOrder(o), 0);   // poin yang didapat (termasuk bonus poin member)
-        stat.poin = Math.max(0, earnedPoin - VoucherAPI.spent());               // saldo = didapat - sudah ditukar
-        document.querySelectorAll('[data-stat]').forEach((el) => { el.textContent = stat[el.dataset.stat]; });
-        renderVoucher();
         const stat = { proses: all.filter((o) => o.status <= 3).length, siap: all.filter((o) => o.status === 4).length, selesai: done.length, poin: done.reduce((t, o) => t + Math.floor(o.total / 1000), 0) };
         document.querySelectorAll('[data-stat]').forEach((el) => { el.textContent = stat[el.dataset.stat]; });
         $('badge-status').textContent = active.length;
@@ -585,14 +524,6 @@ tailwind.config = {
 
       // ---------- struk ----------
       function struk(o) {
-        const s = DB.settings(), on = isOnline(o), tr = tierOf(o.memberTier), d = o.diskon || tr.diskon;
-        const info = [['No. Pesanan', o.id], ['Tanggal', fmt(o.createdAt)], ['Pelanggan', o.nama], ['WhatsApp', o.hp || '-'], ['Layanan', o.paket + ' (' + rp(o.harga) + '/kg)'], ['Parfum', o.parfum || '-'], ['Pengambilan', o.antar ? 'Antar-jemput' + (o.jarak != null ? ' (' + o.jarak + ' km)' : '') : 'Antar & ambil sendiri ke gerai']];
-        if (o.antar && o.alamat) info.push(['Alamat', o.alamat]);
-        if (o.member) info.push(['Member', tr.nama + ' - diskon ' + d + '%' + (o.bonusPoin ? ', bonus poin +' + o.bonusPoin + '%' : '')]);
-        if (o.catatan) info.push(['Catatan', o.catatan.split('\n[BestWash]')[0]]);
-        const money = [['Ongkos antar-jemput', rp(o.ongkir)], ['Biaya cucian', o.berat > 0 ? rp(o.biaya) : 'Dihitung setelah ditimbang']];
-        if (o.member) money.push(['Diskon member', d + '% dari biaya cucian']);
-        if (o.voucherPersen > 0) money.push(['Voucher diskon', o.voucherPersen + '% dari biaya cucian']);
         const s = DB.settings(), on = isOnline(o), d = o.diskon || MEMBER.diskon;
         const info = [['No. Pesanan', o.id], ['Tanggal', fmt(o.createdAt)], ['Pelanggan', o.nama], ['WhatsApp', o.hp || '-'], ['Layanan', o.paket + ' (' + rp(o.harga) + '/kg)'], ['Parfum', o.parfum || '-'], ['Pengambilan', o.antar ? 'Antar-jemput' + (o.jarak != null ? ' (' + o.jarak + ' km)' : '') : 'Antar & ambil sendiri ke gerai']];
         if (o.antar && o.alamat) info.push(['Alamat', o.alamat]);
@@ -651,29 +582,6 @@ tailwind.config = {
 
       // ---------- membership ----------
       function renderMember() {
-        const act = MemberAPI.isActive(), m = MemberAPI.current(), cur = MemberAPI.tier();
-        $('member-label').textContent = act ? 'Member ' + cur.nama : 'Pelanggan Reguler';
-        const CLR = { bronze: ['bg-amber-100 text-amber-800', 'ring-amber-300'], silver: ['bg-slate-200 text-slate-700', 'ring-slate-400'], gold: ['bg-yellow-300 text-yellow-900', 'ring-yellow-400'] };
-        const status = `<article class="rounded-2xl bg-white/95 p-5 shadow-lg sm:p-6"><div class="flex flex-wrap items-start justify-between gap-4"><div><span class="rounded-full ${act ? 'bg-emerald-100 text-emerald-800' : 'bg-aqua text-navy'} px-3 py-1 text-[11px] font-bold">${act ? 'MEMBER ' + esc(cur.nama.toUpperCase()) + ' AKTIF' : 'BELUM MEMBER'}</span><h2 class="mt-3 text-xl font-bold text-heading">${act ? 'Berlaku sampai ' + fmtD(m.sampai) : 'Pilih paket membership'}</h2><p class="mt-1 text-sm text-slate-500">Setiap paket berlaku ${MEMBER.hari} hari. Tingkat lebih tinggi = diskon lebih besar, bonus poin, dan cucian dikerjakan lebih dulu.</p></div><div class="w-full sm:w-56"><label for="member-via" class="block text-xs font-bold text-navy">Metode pembayaran</label><select id="member-via" class="mt-1 h-11 w-full rounded-xl border border-slate-300 bg-white px-4 text-sm text-black"><option>Tunai</option><option>QRIS</option><option>Transfer Bank</option><option>E-Wallet</option></select></div></div></article>`;
-        const cards = Object.values(MEMBER_TIERS).map((t) => {
-          const mine = act && cur.id === t.id, c = CLR[t.id];
-          const perks = ['Diskon ' + t.diskon + '% untuk biaya cucian setiap pesanan', t.bonusPoin ? 'Bonus poin +' + t.bonusPoin + '% di setiap pesanan selesai' : 'Poin rewards standar (1 poin per Rp1.000)', t.prioLabel + ': pesananmu dikerjakan lebih dulu', 'Berlaku ' + MEMBER.hari + ' hari'];
-          const label = mine ? 'Perpanjang ' + MEMBER.hari + ' Hari' : act ? 'Pindah ke ' + t.nama : 'Daftar ' + t.nama;
-          return `<article class="flex flex-col rounded-2xl bg-white/95 p-5 shadow-lg sm:p-6 ${mine ? 'ring-4 ' + c[1] : ''}"><span class="self-start rounded-full ${c[0]} px-3 py-1 text-[11px] font-bold">${esc(t.nama.toUpperCase())}${mine ? ' - PAKET KAMU' : ''}</span><p class="mt-3 text-3xl font-extrabold text-heading">${rp(t.fee)}<span class="text-sm font-medium text-slate-500"> / ${MEMBER.hari} hari</span></p><ul class="mt-4 flex-1 space-y-3">${perks.map((x) => `<li class="flex gap-3 text-sm font-semibold text-slate-700"><span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">&#10003;</span>${esc(x)}</li>`).join('')}</ul><button type="button" data-join="${t.id}" class="mt-5 w-full rounded-xl bg-navy px-4 py-3 text-sm font-bold text-white transition hover:bg-[#093a63] focus:outline-none focus-visible:ring-4 focus-visible:ring-brand/30">${label}</button></article>`;
-        }).join('');
-        const note = `<p class="rounded-xl bg-white/90 p-3 text-xs text-slate-600">Diskon dihitung dari biaya cucian setelah penimbangan (ongkos antar-jemput tidak didiskon). Bonus poin dihitung saat pesanan selesai. Urutan prioritas pengerjaan: Gold, Silver, Bronze, lalu pelanggan reguler.</p>`;
-        $('member-card').innerHTML = '<div class="space-y-6">' + status + '<div class="grid gap-6 md:grid-cols-3">' + cards + '</div>' + note + '</div>';
-      }
-
-      $('member-card').addEventListener('click', async (e) => {
-        const b = e.target.closest('[data-join]'); if (!b) return;
-        const t = tierOf(b.dataset.join), via = $('member-via').value, st = DB.settings(), cur = MemberAPI.tier();
-        let msg = (cur && cur.id === t.id ? 'Perpanjang' : 'Daftar') + ' Membership ' + t.nama + ' ' + rp(t.fee) + ' untuk ' + MEMBER.hari + ' hari via ' + via + '?';
-        if (cur && cur.id !== t.id) msg += '\n\nPaket ' + cur.nama + ' yang masih aktif akan diganti, dan masa berlaku dihitung ulang mulai hari ini.';
-        if (!confirm(msg)) return;
-        try { await MemberAPI.join(me, via, t.id); } catch (err) { return alert('Gagal: ' + (err.message || err)); }
-        renderMember(); paint(); renderAll();
-        toast(via === 'Tunai' ? 'Membership ' + t.nama + ' aktif. Bayar ' + rp(t.fee) + ' tunai ke kasir BestWash.' : 'Membership ' + t.nama + ' aktif. Transfer ' + rp(t.fee) + ' ke ' + st.rekening + ' lalu kirim bukti via WhatsApp.');
         const act = MemberAPI.isActive(), m = MemberAPI.current();
         $('member-label').textContent = act ? 'Member Aktif' : 'Pelanggan Reguler';
         const perks = ['Diskon ' + MEMBER.diskon + '% untuk biaya cucian setiap pesanan', 'Prioritas laundry: pesananmu dikerjakan lebih dulu', 'Berlaku ' + MEMBER.hari + ' hari, bisa diperpanjang kapan saja'];
@@ -702,29 +610,6 @@ tailwind.config = {
           bukaStruk(o);
         },
       });
-
-      // ---------- tukar poin -> voucher diskon ----------
-      function renderVoucher() {
-        const saldo = Math.max(0, earnedPoin - VoucherAPI.spent()), act = VoucherAPI.active();
-        $('poin-foot').textContent = act.length ? act.length + ' voucher aktif - bisa dipakai saat memesan' : 'Tukar poin jadi voucher diskon';
-        $('voucher-opsi').innerHTML = VOUCHERS.map((t) => { const ok = saldo >= t.poin; return `<div class="flex items-center justify-between gap-3 rounded-xl border border-slate-200 p-3"><div><p class="text-sm font-bold text-heading">Diskon ${t.persen}%</p><p class="text-xs text-slate-500">${t.poin.toLocaleString('id-ID')} poin${ok ? '' : ' - kurang ' + (t.poin - saldo).toLocaleString('id-ID') + ' poin'}</p></div><button type="button" data-tukar="${t.poin}"${ok ? '' : ' disabled'} class="rounded-full bg-navy px-4 py-2 text-xs font-bold text-white transition hover:bg-[#093a63] focus:outline-none focus-visible:ring-4 focus-visible:ring-brand/30 disabled:cursor-not-allowed disabled:opacity-40">Tukar</button></div>`; }).join('');
-        $('voucher-saya').innerHTML = act.length ? act.map((v) => `<div class="flex items-center justify-between rounded-xl bg-emerald-50 px-3 py-2 text-sm"><span class="font-bold text-emerald-800">Voucher diskon ${v.persen}%</span><span class="text-xs text-emerald-700">Siap dipakai</span></div>`).join('') : '<p class="rounded-xl bg-slate-50 p-3 text-center text-xs text-slate-500">Belum ada voucher aktif.</p>';
-      }
-      const dlgV = $('dlg-voucher');
-      const bukaVoucher = (on) => { dlgV.classList.toggle('hidden', !on); dlgV.classList.toggle('flex', on); if (on) renderVoucher(); };
-      $('btn-tukar').addEventListener('click', () => bukaVoucher(true));
-      $('voucher-tutup').addEventListener('click', () => bukaVoucher(false));
-      dlgV.addEventListener('click', (e) => { if (e.target === dlgV) bukaVoucher(false); });
-      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') bukaVoucher(false); });
-      $('voucher-opsi').addEventListener('click', async (e) => {
-        const b = e.target.closest('[data-tukar]'); if (!b) return;
-        const tier = VOUCHERS.find((t) => t.poin === +b.dataset.tukar); if (!tier) return;
-        if (!confirm('Tukar ' + tier.poin.toLocaleString('id-ID') + ' poin dengan voucher diskon ' + tier.persen + '%?')) return;
-        b.disabled = true;
-        try { await VoucherAPI.redeem(me, tier, earnedPoin); } catch (err) { b.disabled = false; return alert('Gagal menukar poin: ' + (err.message || err)); }
-        renderAll(); paint(); bukaVoucher(false);
-        toast('Voucher diskon ' + tier.persen + '% berhasil ditukar. Pilih voucher di formulir pemesanan.');
-      });
       function pilihPaket(id) {
         const r = [...document.querySelectorAll('#form-pesan input[name="paket"]')].find((x) => x.value === id);
         if (r) { r.checked = true; paint(); }
@@ -744,7 +629,6 @@ tailwind.config = {
       const baru = new URLSearchParams(location.search).get('baru');
       applySettings(); renderAll(); setTab();
       MemberAPI.load(me).then(() => { renderMember(); paint(); });
-      VoucherAPI.load(me).then(() => { renderAll(); paint(); });
       if (baru) toast('Pesanan #' + baru + ' berhasil dibuat dan masuk ke Status Laundry.');
       document.addEventListener('click', (e) => {
         const b = e.target.closest('[data-selesai]'); if (!b) return;

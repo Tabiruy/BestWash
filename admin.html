@@ -344,12 +344,6 @@ tailwind.config = {
       function renderPesanan() {
         const q = $('q-pesanan').value.trim().toLowerCase(), f = $('f-status').value;
         const rows = newest(DB.orders()).filter((o) => (f === '' || String(o.status) === f) && (!q || [o.id, o.nama, o.user, o.paket].join(' ').toLowerCase().includes(q)));
-        const pri = (o) => (o.status < 5 ? (o.memberTier ? tierOf(o.memberTier).prioritas : (o.prioritas ? 1 : 0)) : 0);
-        rows.sort((a, b) => pri(b) - pri(a));   // Gold > Silver > Bronze > non-member dikerjakan lebih dulu
-        $('tbl-pesanan').innerHTML = table(['Pesanan', 'Pelanggan', 'Layanan', 'Total', 'Status', 'Aksi'], rows.map((o) => `<tr>
-          <td class="${TD} font-semibold">${esc(o.id)}${o.prioritas ? ' <span class="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">' + (o.memberTier ? esc(tierOf(o.memberTier).nama.toUpperCase()) : 'PRIORITAS') + '</span>' : ''}<div class="text-xs font-normal text-slate-500">${fmtDT(o.createdAt)}</div></td>
-          <td class="${TD}">${esc(o.nama)}<div class="text-xs text-slate-500">${esc(o.hp)}</div></td>
-          <td class="${TD}">${esc(o.paket)}<div class="text-xs ${o.berat > 0 ? 'text-slate-500' : 'font-semibold text-amber-600'}">${o.berat > 0 ? o.berat + ' kg' : 'belum ditimbang'}${o.antar ? ' · antar-jemput' + (o.jarak != null ? ' (' + o.jarak + ' km)' : '') : ''}</div><div class="text-xs text-slate-500">${o.member ? 'Member -' + o.diskon + '% · ' : ''}${o.voucherPersen > 0 ? 'Voucher -' + o.voucherPersen + '% · ' : ''}${esc(o.bayar)} · ${o.bayarStatus === 'lunas' ? '<b class="text-emerald-600">lunas</b>' : 'belum bayar'}</div></td>
         const pri = (o) => (o.prioritas && o.status < 5 ? 1 : 0);
         rows.sort((a, b) => pri(b) - pri(a));   // member (prioritas) dikerjakan lebih dulu
         $('tbl-pesanan').innerHTML = table(['Pesanan', 'Pelanggan', 'Layanan', 'Total', 'Status', 'Aksi'], rows.map((o) => `<tr>
@@ -391,9 +385,6 @@ tailwind.config = {
         const ongkir = $('o-antar').checked ? (old && old.antar ? old.ongkir : DB.settings().ongkir) : 0;
         const diskon = old ? old.diskon || 0 : 0;   // diskon member yang tercatat di pesanan
         const biaya = harga * berat;
-        const setelahDiskon = Math.round(biaya * (1 - diskon / 100));
-        const voucher = Math.round(setelahDiskon * (old ? old.voucherPersen || 0 : 0) / 100);   // voucher hasil tukar poin (%), setelah diskon member
-        return { svc, harga, berat, ongkir, biaya, voucher, total: setelahDiskon - voucher + ongkir };
         return { svc, harga, berat, ongkir, biaya, total: Math.round(biaya * (1 - diskon / 100)) + ongkir };
       }
       function paintTotal() {
