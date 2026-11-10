@@ -49,6 +49,12 @@ document.addEventListener("DOMContentLoaded", () => {
       return "Email sudah terdaftar. Silakan login.";
     if (msg.includes("database error saving new user"))
       return "Username sudah dipakai atau formatnya tidak valid.";
+    if (msg.includes("otp") && (msg.includes("expired") || msg.includes("invalid")))
+      return "Kode salah atau sudah kedaluwarsa.";
+    if (msg.includes("different from the old password"))
+      return "Password baru tidak boleh sama dengan password lama.";
+    if (msg.includes("rate limit") || msg.includes("security purposes"))
+      return "Terlalu banyak percobaan. Tunggu sebentar lalu coba lagi.";
     if (msg.includes("rate limit"))
       return "Terlalu banyak percobaan. Tunggu beberapa menit lalu coba lagi.";
     if (msg.includes("failed to fetch"))
@@ -160,6 +166,176 @@ document.addEventListener("DOMContentLoaded", () => {
         showAlert(translateError(err));
       } finally {
         setLoading(button, false);
+      }
+    });
+  }
+
+  // =====================================================================
+  // LUPA PASSWORD (modal di login.html)
+  // Alur: email/username -> kode OTP dikirim ke email -> kode + password baru
+  // Catatan: template email "Reset Password" di Supabase harus memuat {{ .Token }}
+  // =====================================================================
+  if (loginForm) {
+    const modal = $("forgot-modal");
+    const card = $("forgot-card");
+    const step1 = $("forgot-step-1");
+    const step2 = $("forgot-step-2");
+    const err1 = $("forgot-error-1");
+    const err2 = $("forgot-error-2");
+    const idInput = $("forgot-id");
+    const otpInput = $("forgot-otp");
+    const newPass = $("forgot-new-password");
+    const confirmPass = $("forgot-confirm-password");
+    const sendBtn = $("btn-forgot-send");
+    const resetBtn = $("btn-forgot-reset");
+    const resendBtn = $("btn-forgot-resend");
+
+    let resetEmail = ""; // email tujuan kode
+    let cooldownTimer = null;
+
+    const showErr = (el, msg) => {
+      el.textContent = msg;
+      el.classList.remove("hidden");
+    };
+    const hideErr = (el) => el.classList.add("hidden");
+
+    function openModal() {
+      step1.classList.remove("hidden");
+      step2.classList.add("hidden");
+      hideErr(err1);
+      hideErr(err2);
+      idInput.value = $("username").value.trim();
+      modal.classList.remove("opacity-0", "pointer-events-none");
+      card.classList.remove("scale-95");
+      card.classList.add("scale-100");
+      idInput.focus();
+    }
+
+    function closeModal() {
+      modal.classList.add("opacity-0", "pointer-events-none");
+      card.classList.remove("scale-100");
+      card.classList.add("scale-95");
+      otpInput.value = newPass.value = confirmPass.value = "";
+      clearInterval(cooldownTimer);
+    }
+
+    // Tombol "Kirim ulang kode" dikunci 60 dtk (batas kirim email Supabase)
+    function startCooldown(seconds = 60) {
+      clearInterval(cooldownTimer);
+      let left = seconds;
+      resendBtn.disabled = true;
+      resendBtn.textContent = "Kirim ulang kode (" + left + " dtk)";
+      cooldownTimer = setInterval(() => {
+        left--;
+        if (left <= 0) {
+          clearInterval(cooldownTimer);
+          resendBtn.disabled = false;
+          resendBtn.textContent = "Kirim ulang kode";
+        } else {
+          resendBtn.textContent = "Kirim ulang kode (" + left + " dtk)";
+        }
+      }, 1000);
+    }
+
+    // Ubah input (email / username) menjadi email
+    async function resolveEmail(value) {
+      if (value.includes("@")) return value;
+      if (value.toLowerCase() === ADMIN_USERNAME) return ADMIN_EMAIL;
+      const { data, error } = await supabaseClient.rpc(
+        "get_email_by_username",
+        { p_username: value },
+      );
+      if (error) throw error;
+      return data;
+    }
+
+    async function sendCode(target) {
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(target);
+      if (error) throw error;
+      resetEmail = target;
+      startCooldown();
+    }
+
+    $("forgot-link").addEventListener("click", openModal);
+    $("btn-forgot-close").addEventListener("click", closeModal);
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    // Langkah 1: kirim kode ke email
+    sendBtn.addEventListener("click", async () => {
+      hideErr(err1);
+      const value = idInput.value.trim();
+      if (!value) return showErr(err1, "Isi email atau username dulu.");
+      if (!SUPABASE_READY) return showErr(err1, supabaseNotReadyMessage());
+
+      setLoading(sendBtn, true);
+      try {
+        const target = await resolveEmail(value);
+        if (!target)
+          return showErr(err1, "Akun dengan username/email itu tidak ditemukan.");
+        await sendCode(target);
+        $("forgot-email-shown").textContent = target;
+        step1.classList.add("hidden");
+        step2.classList.remove("hidden");
+        otpInput.focus();
+      } catch (err) {
+        showErr(err1, translateError(err));
+      } finally {
+        setLoading(sendBtn, false);
+      }
+    });
+
+    // Kirim ulang kode
+    resendBtn.addEventListener("click", async () => {
+      hideErr(err2);
+      resendBtn.disabled = true;
+      try {
+        await sendCode(resetEmail);
+      } catch (err) {
+        resendBtn.disabled = false;
+        showErr(err2, translateError(err));
+      }
+    });
+
+    // Langkah 2: verifikasi kode lalu simpan password baru
+    resetBtn.addEventListener("click", async () => {
+      hideErr(err2);
+      const token = otpInput.value.trim();
+      const pass = newPass.value;
+
+      if (!/^\d{6,10}$/.test(token))
+        return showErr(err2, "Masukkan kode verifikasi dari emailmu (angka).");
+      if (pass.length < 6)
+        return showErr(err2, "Password minimal 6 karakter.");
+      if (pass !== confirmPass.value)
+        return showErr(err2, "Konfirmasi password tidak sama.");
+
+      setLoading(resetBtn, true);
+      try {
+        // Kode benar -> Supabase membuka sesi sementara untuk ganti password
+        const { error: errOtp } = await supabaseClient.auth.verifyOtp({
+          email: resetEmail,
+          token,
+          type: "recovery",
+        });
+        if (errOtp) throw errOtp;
+
+        const { error: errUpd } = await supabaseClient.auth.updateUser({
+          password: pass,
+        });
+        if (errUpd) throw errUpd;
+
+        // Selesai: keluar dari sesi sementara, minta user login dengan password baru
+        await supabaseClient.auth.signOut();
+        BestWashAuth.clearLocal();
+        closeModal();
+        $("password").value = "";
+        showAlert("Password berhasil diubah. Silakan login.", "success");
+      } catch (err) {
+        showErr(err2, translateError(err));
+      } finally {
+        setLoading(resetBtn, false);
       }
     });
   }
