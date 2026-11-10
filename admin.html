@@ -6,6 +6,11 @@
   <title>Admin - BestWash</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase + proteksi halaman (HARUS di <head>, sebelum script lain) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="orders-api.js"></script>
+  <script src="guard.js" data-role="admin"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap" rel="stylesheet" />
@@ -26,134 +31,128 @@ tailwind.config = {
   },
 };
   </script>
+  <style>*,*::before,*::after{box-sizing:border-box}html{scroll-behavior:smooth}body{max-width:100%;overflow-x:hidden}img,svg,video,canvas{max-width:100%}input,select,textarea,button{max-width:100%}main,section,form,aside{min-width:0}table{max-width:100%} @media(max-width:640px){.overflow-x-auto{max-width:100%}}</style>
 </head>
-<body class="bg-slate-100 font-sans text-slate-800 antialiased">
-<div class="flex min-h-screen flex-col lg:flex-row">
-  <aside class="flex w-full shrink-0 flex-col border-b border-slate-200 bg-white lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:border-b-0 lg:border-r">
-    <a href="admin.html" class="flex items-center gap-3 bg-gradient-to-r from-sky-600 to-cyan-500 px-5 py-5 text-white">
-      <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-white/20"><svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="13" r="4"/></svg></span>
-      <span><span class="block text-lg font-bold leading-tight">BestWash</span><span class="block text-[10px] font-semibold tracking-wide">ADMIN PANEL</span></span>
-    </a>
-    <div class="p-4">
-      <div class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3">
-        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-sky-500 to-indigo-500 text-sm font-bold text-white">A</span>
-        <div class="min-w-0"><p class="truncate text-sm font-bold">Administrator</p><p class="text-xs text-slate-500">Pengelola BestWash</p>
-          <span class="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-700"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Akses Penuh</span></div>
+
+<body class="relative min-h-screen overflow-x-hidden bg-brand font-sans text-black antialiased">
+  <div class="relative z-10 mx-auto max-w-7xl px-4 pt-6 sm:px-6">
+    <a href="landing_page.html" class="inline-flex items-center gap-2 rounded-full bg-navy px-6 py-3 text-base font-bold text-white shadow-md transition hover:bg-[#093a63] focus:outline-none focus-visible:ring-4 focus-visible:ring-white/70"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H4M10 6l-6 6 6 6"/></svg> Kembali</a>
+  </div>
+
+  <div class="relative z-10 mx-auto max-w-7xl px-4 pb-48 pt-5 sm:px-6 lg:grid lg:grid-cols-[17rem_minmax(0,1fr)] lg:items-start lg:gap-6">
+    <aside class="self-start overflow-hidden rounded-2xl border border-white/60 shadow-md lg:sticky lg:top-6">
+      <div class="flex items-center gap-3 bg-white/85 p-5"><span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-brand/15 text-xl font-bold text-heading">A</span>
+        <div class="min-w-0"><p class="truncate text-lg font-bold text-heading">Administrator</p><p class="text-sm font-semibold text-navy">Pengelola BestWash</p>
+          <span class="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-bold text-emerald-700"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Akses Penuh</span></div></div>
+      <nav id="nav" class="flex gap-1 overflow-x-auto bg-nav p-3 lg:flex-col lg:overflow-visible"><a href="#ringkasan" data-tab="ringkasan" class="flex shrink-0 items-center gap-3 whitespace-nowrap rounded-xl px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/20 focus:outline-none focus-visible:ring-4 focus-visible:ring-white/60"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard Ringkasan</span></a><a href="#pesanan" data-tab="pesanan" class="flex shrink-0 items-center gap-3 whitespace-nowrap rounded-xl px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/20 focus:outline-none focus-visible:ring-4 focus-visible:ring-white/60"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4h6a1 1 0 0 1 1 1v2H8V5a1 1 0 0 1 1-1z"/><path d="M8 6H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-2M9 15l2 2 4-4"/></svg><span>Kelola Pesanan</span></a><a href="#layanan" data-tab="layanan" class="flex shrink-0 items-center gap-3 whitespace-nowrap rounded-xl px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/20 focus:outline-none focus-visible:ring-4 focus-visible:ring-white/60"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12l-8 8-9-9V3h8z"/><circle cx="7.5" cy="7.5" r="1"/></svg><span>Kelola Layanan</span></a><a href="#pelanggan" data-tab="pelanggan" class="flex shrink-0 items-center gap-3 whitespace-nowrap rounded-xl px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/20 focus:outline-none focus-visible:ring-4 focus-visible:ring-white/60"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-7 7-7s7 3 7 7M17 11a3 3 0 1 0 0-6M22 21c0-3-2-5-4-6"/></svg><span>Data Pelanggan</span></a><a href="#laporan" data-tab="laporan" class="flex shrink-0 items-center gap-3 whitespace-nowrap rounded-xl px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/20 focus:outline-none focus-visible:ring-4 focus-visible:ring-white/60"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg><span>Laporan</span></a><a href="#pengaturan" data-tab="pengaturan" class="flex shrink-0 items-center gap-3 whitespace-nowrap rounded-xl px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/20 focus:outline-none focus-visible:ring-4 focus-visible:ring-white/60"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg><span>Pengaturan</span></a></nav>
+      <div class="bg-nav px-3 pb-3">
+        <button id="logout" type="button" class="flex w-full items-center justify-center gap-2 rounded-xl bg-navy px-4 py-3 text-sm font-bold text-white transition hover:bg-[#093a63] focus:outline-none focus-visible:ring-4 focus-visible:ring-white/60"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Keluar (Logout)</button>
       </div>
-    </div>
-    <nav id="nav" class="flex gap-1 overflow-x-auto px-4 pb-3 lg:flex-1 lg:flex-col lg:overflow-visible"><a href="#ringkasan" data-tab="ringkasan" class="flex shrink-0 items-center gap-3 whitespace-nowrap rounded-xl px-3 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard Ringkasan</a><a href="#pesanan" data-tab="pesanan" class="flex shrink-0 items-center gap-3 whitespace-nowrap rounded-xl px-3 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4h6a1 1 0 0 1 1 1v2H8V5a1 1 0 0 1 1-1z"/><path d="M8 6H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-2M9 15l2 2 4-4"/></svg>Kelola Pesanan</a><a href="#layanan" data-tab="layanan" class="flex shrink-0 items-center gap-3 whitespace-nowrap rounded-xl px-3 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12l-8 8-9-9V3h8z"/><circle cx="7.5" cy="7.5" r="1"/></svg>Kelola Layanan</a><a href="#pelanggan" data-tab="pelanggan" class="flex shrink-0 items-center gap-3 whitespace-nowrap rounded-xl px-3 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-7 7-7s7 3 7 7M17 11a3 3 0 1 0 0-6M22 21c0-3-2-5-4-6"/></svg>Data Pelanggan</a><a href="#laporan" data-tab="laporan" class="flex shrink-0 items-center gap-3 whitespace-nowrap rounded-xl px-3 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Laporan</a><a href="#pengaturan" data-tab="pengaturan" class="flex shrink-0 items-center gap-3 whitespace-nowrap rounded-xl px-3 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg>Pengaturan</a></nav>
-    <div class="border-t border-slate-200 p-4">
-      <button id="logout" type="button" class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-rose-600 transition hover:bg-rose-50"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Keluar (Logout)</button>
-    </div>
-  </aside>
+    </aside>
 
-  <div class="min-w-0 flex-1">
-    <header class="sticky top-0 z-20 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-4 sm:px-6">
-      <div><h1 id="judul" class="text-xl font-extrabold sm:text-2xl">Dashboard Ringkasan</h1><p id="sub" class="text-sm text-slate-500"></p></div>
-      <a href="landingpage.html" class="rounded-xl border border-slate-200 px-4 py-2 text-sm font-bold text-slate-700 transition hover:bg-slate-50">Lihat Website</a>
-    </header>
+    <main class="mt-6 min-w-0 space-y-6 lg:mt-0">
+      <div class="flex flex-wrap items-end justify-between gap-3">
+        <div><h1 id="judul" class="text-3xl font-bold text-white">Dashboard Ringkasan</h1><p id="sub" class="mt-1 text-white/90"></p></div>
+      </div>
+      <div id="toast" role="status" class="fixed bottom-5 right-5 z-50 hidden rounded-xl bg-navy px-4 py-3 text-sm font-semibold text-white shadow-lg"></div>
 
-    <main class="space-y-6 p-4 sm:p-6">
-      <div id="toast" role="status" class="fixed bottom-5 right-5 z-50 hidden rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white shadow-lg"></div>
-
-      <!-- RINGKASAN -->
       <section data-panel="ringkasan" class="space-y-6">
         <div id="stat-grid" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"></div>
         <div class="grid gap-6 xl:grid-cols-[1.5fr_1fr]">
-          <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-100"><h2 class="text-lg font-extrabold">Pesanan Terbaru</h2><div id="recent" class="mt-3 overflow-x-auto"></div></div>
-          <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-100"><h2 class="text-lg font-extrabold">Status Pesanan</h2><div id="status-bars" class="mt-4 space-y-3"></div></div>
+          <div class="rounded-2xl bg-white/95 p-5 shadow-lg"><h2 class="text-lg font-bold text-heading">Pesanan Terbaru</h2><div id="recent" class="mt-3 overflow-x-auto"></div></div>
+          <div class="rounded-2xl bg-white/95 p-5 shadow-lg"><h2 class="text-lg font-bold text-heading">Status Pesanan</h2><div id="status-bars" class="mt-4 space-y-3"></div></div>
         </div>
       </section>
 
-      <!-- PESANAN (CRUD) -->
-      <section data-panel="pesanan" class="hidden rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
+      <section data-panel="pesanan" class="hidden rounded-2xl bg-white/95 p-5 shadow-lg sm:p-6">
         <div class="flex flex-wrap items-center gap-3">
-          <input id="q-pesanan" type="search" placeholder="Cari ID, pelanggan, paket..." class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-100 min-w-0 flex-1" />
-          <select id="f-status" class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-100"><option value="">Semua status</option><option value="0">Pesanan Diterima</option><option value="1">Penimbangan &amp; Penilaian</option><option value="2">Proses Cuci &amp; Pengeringan</option><option value="3">Setrika &amp; Packaging</option><option value="4">Siap Diambil / Diantar</option><option value="5">Selesai</option></select>
-          <button id="btn-add-order" type="button" class="rounded-xl bg-sky-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-sky-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-sky-200">+ Tambah Pesanan</button>
+          <input id="q-pesanan" type="search" placeholder="Cari ID, pelanggan, paket..." class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/20 min-w-0 flex-1" />
+          <select id="f-status" class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/20"><option value="">Semua status</option><option value="0">Pesanan Diterima</option><option value="1">Penimbangan &amp; Penilaian</option><option value="2">Proses Cuci &amp; Pengeringan</option><option value="3">Setrika &amp; Packaging</option><option value="4">Siap Diambil / Diantar</option><option value="5">Selesai</option></select>
+          <button id="btn-add-order" type="button" class="rounded-full bg-navy px-6 py-3 text-sm font-bold text-white shadow-md transition hover:bg-[#093a63] focus:outline-none focus-visible:ring-4 focus-visible:ring-heading/40">+ Tambah Pesanan</button>
         </div>
         <div id="tbl-pesanan" class="mt-4 overflow-x-auto"></div>
       </section>
 
-      <!-- LAYANAN (CRUD) -->
-      <section data-panel="layanan" class="hidden rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
-        <div class="flex flex-wrap items-center justify-between gap-3"><p class="text-sm text-slate-500">Layanan aktif tampil di kartu harga website dan formulir pemesanan.</p><button id="btn-add-svc" type="button" class="rounded-xl bg-sky-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-sky-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-sky-200">+ Tambah Layanan</button></div>
-        <div id="tbl-layanan" class="mt-4 overflow-x-auto"></div>
+      <section data-panel="layanan" class="hidden space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-3"><p class="text-sm font-semibold text-white">Layanan yang tampil di website muncul di kartu harga dan formulir pemesanan.</p><button id="btn-add-svc" type="button" class="rounded-full bg-white px-5 py-2.5 text-sm font-bold text-heading shadow-md transition hover:bg-aqua">+ Tambah Layanan</button></div>
+        <div id="tbl-layanan"></div>
       </section>
 
-      <!-- PELANGGAN -->
-      <section data-panel="pelanggan" class="hidden rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
-        <input id="q-pelanggan" type="search" placeholder="Cari username atau email..." class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-100 w-full sm:max-w-sm" />
+      <section data-panel="pelanggan" class="hidden rounded-2xl bg-white/95 p-5 shadow-lg sm:p-6">
+        <input id="q-pelanggan" type="search" placeholder="Cari username atau email..." class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/20 w-full sm:max-w-sm" />
         <div id="tbl-pelanggan" class="mt-4 overflow-x-auto"></div>
       </section>
 
-      <!-- LAPORAN -->
       <section data-panel="laporan" class="hidden space-y-6">
-        <div class="flex flex-wrap items-center gap-3 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
-          <label for="periode" class="text-sm font-bold">Periode</label>
-          <select id="periode" class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-100"><option value="7">7 hari terakhir</option><option value="30" selected>30 hari terakhir</option><option value="0">Semua waktu</option></select>
-          <button id="btn-csv" type="button" class="rounded-xl bg-sky-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-sky-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-sky-200 ml-auto">Unduh CSV</button>
+        <div class="flex flex-wrap items-center gap-3 rounded-2xl bg-white/95 p-5 shadow-lg sm:p-6">
+          <label for="periode" class="text-sm font-bold text-navy">Periode</label>
+          <select id="periode" class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/20"><option value="7">7 hari terakhir</option><option value="30" selected>30 hari terakhir</option><option value="0">Semua waktu</option></select>
+          <button id="btn-csv" type="button" class="rounded-full bg-navy px-6 py-3 text-sm font-bold text-white shadow-md transition hover:bg-[#093a63] focus:outline-none focus-visible:ring-4 focus-visible:ring-heading/40 ml-auto">Unduh CSV</button>
         </div>
         <div id="laporan" class="space-y-6"></div>
       </section>
 
-      <!-- PENGATURAN -->
       <section data-panel="pengaturan" class="hidden space-y-6">
-        <form id="form-set" class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-100 sm:p-6">
-          <h2 class="text-lg font-extrabold">Informasi Usaha</h2>
+        <form id="form-set" class="rounded-2xl bg-white/95 p-5 shadow-lg sm:p-6">
+          <h2 class="text-lg font-bold text-heading">Informasi Usaha</h2>
           <div class="mt-4 grid gap-4 sm:grid-cols-2">
-            <div><label for="set-wa" class="block text-xs font-bold tracking-wide text-slate-600">Nomor WhatsApp (format 62...)</label><input id="set-wa" type="text" inputmode="numeric" required class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-100 mt-1 w-full" /></div> <div><label for="set-telp" class="block text-xs font-bold tracking-wide text-slate-600">Nomor tampilan di website</label><input id="set-telp" type="text" required class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-100 mt-1 w-full" /></div> <div><label for="set-alamat" class="block text-xs font-bold tracking-wide text-slate-600">Alamat</label><input id="set-alamat" type="text" required class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-100 mt-1 w-full" /></div> <div><label for="set-jam" class="block text-xs font-bold tracking-wide text-slate-600">Jam buka</label><input id="set-jam" type="text" required class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-100 mt-1 w-full" /></div> <div><label for="set-ongkir" class="block text-xs font-bold tracking-wide text-slate-600">Biaya antar-jemput (Rp)</label><input id="set-ongkir" type="number" min="0" step="500" required class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-100 mt-1 w-full" /></div>
+            <div><label for="set-wa" class="block text-xs font-bold tracking-wide text-navy">Nomor WhatsApp (format 62...)</label><input id="set-wa" type="text" inputmode="numeric" required class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/20 mt-1 w-full" /></div> <div><label for="set-telp" class="block text-xs font-bold tracking-wide text-navy">Nomor tampilan di website</label><input id="set-telp" type="text" required class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/20 mt-1 w-full" /></div> <div><label for="set-alamat" class="block text-xs font-bold tracking-wide text-navy">Alamat</label><input id="set-alamat" type="text" required class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/20 mt-1 w-full" /></div> <div><label for="set-jam" class="block text-xs font-bold tracking-wide text-navy">Jam buka</label><input id="set-jam" type="text" required class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/20 mt-1 w-full" /></div> <div><label for="set-ongkir" class="block text-xs font-bold tracking-wide text-navy">Biaya antar-jemput (Rp)</label><input id="set-ongkir" type="number" min="0" step="500" required class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/20 mt-1 w-full" /></div>
           </div>
-          <button type="submit" class="rounded-xl bg-sky-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-sky-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-sky-200 mt-5">Simpan Pengaturan</button>
+          <button type="submit" class="rounded-full bg-navy px-6 py-3 text-sm font-bold text-white shadow-md transition hover:bg-[#093a63] focus:outline-none focus-visible:ring-4 focus-visible:ring-heading/40 mt-5">Simpan Pengaturan</button>
         </form>
-        <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-100 sm:p-6">
-          <h2 class="text-lg font-extrabold">Data</h2>
-          <p class="mt-1 text-sm text-slate-500">Semua data tersimpan di browser ini (localStorage).</p>
+        <div class="rounded-2xl bg-white/95 p-5 shadow-lg sm:p-6">
+          <h2 class="text-lg font-bold text-heading">Data</h2>
+          <p class="mt-1 text-sm text-slate-500">Pesanan tersimpan di Supabase. Layanan &amp; pengaturan masih di browser ini (localStorage).</p>
           <div class="mt-4 flex flex-wrap gap-3">
-            <button id="btn-seed" type="button" class="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold hover:bg-slate-50">Tambah Data Contoh</button>
-            <button id="btn-clear-orders" type="button" class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-bold text-amber-800 hover:bg-amber-100">Hapus Semua Pesanan</button>
-            <button id="btn-reset" type="button" class="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm font-bold text-rose-700 hover:bg-rose-100">Reset Semua Data</button>
+            <button id="btn-seed" type="button" hidden class="rounded-full border border-heading/30 px-5 py-2.5 text-sm font-bold text-heading hover:bg-brand/10">Tambah Data Contoh</button>
+            <button id="btn-clear-orders" type="button" class="rounded-full border border-amber-300 bg-amber-50 px-5 py-2.5 text-sm font-bold text-amber-800 hover:bg-amber-100">Hapus Semua Pesanan</button>
+            <button id="btn-reset" type="button" class="rounded-full border border-rose-300 bg-rose-50 px-5 py-2.5 text-sm font-bold text-rose-700 hover:bg-rose-100">Reset Semua Data</button>
           </div>
         </div>
       </section>
     </main>
   </div>
-</div>
 
 <!-- DIALOG PESANAN -->
 <dialog id="dlg-order" class="w-[min(94vw,38rem)] rounded-3xl p-0 shadow-2xl backdrop:bg-black/40">
   <form id="form-order" class="p-6">
-    <h2 id="o-title" class="text-xl font-extrabold">Tambah Pesanan</h2>
+    <h2 id="o-title" class="text-xl font-bold text-heading">Tambah Pesanan</h2>
     <input id="o-id" type="hidden" />
     <div class="mt-4 grid gap-4 sm:grid-cols-2">
-      <div><label for="o-nama" class="block text-xs font-bold tracking-wide text-slate-600">Nama / username pelanggan</label><input id="o-nama" type="text" required class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-100 mt-1 w-full" /></div> <div><label for="o-hp" class="block text-xs font-bold tracking-wide text-slate-600">Nomor WhatsApp</label><input id="o-hp" type="tel" class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-100 mt-1 w-full" /></div>
-      <div><label for="o-svc" class="block text-xs font-bold tracking-wide text-slate-600">Layanan</label><select id="o-svc" required class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-100 mt-1 w-full"></select></div>
-      <div><label for="o-berat" class="block text-xs font-bold tracking-wide text-slate-600">Berat (kg)</label><input id="o-berat" type="number" min="0.5" max="50" step="0.5" required class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-100 mt-1 w-full" /></div>
-      <div><label for="o-parfum" class="block text-xs font-bold tracking-wide text-slate-600">Parfum</label><select id="o-parfum" class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-100 mt-1 w-full"><option>Ocean Fresh</option><option>Lavender</option><option>Sakura</option><option>Tanpa parfum</option></select></div>
-      <div><label for="o-status" class="block text-xs font-bold tracking-wide text-slate-600">Status</label><select id="o-status" class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-100 mt-1 w-full"><option value="0">Pesanan Diterima</option><option value="1">Penimbangan &amp; Penilaian</option><option value="2">Proses Cuci &amp; Pengeringan</option><option value="3">Setrika &amp; Packaging</option><option value="4">Siap Diambil / Diantar</option><option value="5">Selesai</option></select></div>
+      <div><label for="o-nama" class="block text-xs font-bold tracking-wide text-navy">Nama / username pelanggan</label><input id="o-nama" type="text" required class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/20 mt-1 w-full" /></div> <div><label for="o-hp" class="block text-xs font-bold tracking-wide text-navy">Nomor WhatsApp</label><input id="o-hp" type="tel" class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/20 mt-1 w-full" /></div>
+      <div><label for="o-svc" class="block text-xs font-bold tracking-wide text-navy">Layanan</label><select id="o-svc" required class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/20 mt-1 w-full"></select></div>
+      <div><label for="o-berat" class="block text-xs font-bold tracking-wide text-navy">Berat (kg) - isi setelah ditimbang</label><input id="o-berat" type="number" min="0" max="50" step="0.1" placeholder="Kosongkan jika belum ditimbang" class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/20 mt-1 w-full" /></div>
+      <div><label for="o-parfum" class="block text-xs font-bold tracking-wide text-navy">Parfum</label><select id="o-parfum" class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/20 mt-1 w-full"><option>Ocean Fresh</option><option>Lavender</option><option>Sakura</option><option>Tanpa parfum</option></select></div>
+      <div><label for="o-status" class="block text-xs font-bold tracking-wide text-navy">Status</label><select id="o-status" class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/20 mt-1 w-full"><option value="0">Pesanan Diterima</option><option value="1">Penimbangan &amp; Penilaian</option><option value="2">Proses Cuci &amp; Pengeringan</option><option value="3">Setrika &amp; Packaging</option><option value="4">Siap Diambil / Diantar</option><option value="5">Selesai</option></select></div>
     </div>
-    <label class="mt-4 flex items-center gap-2 text-sm font-semibold"><input id="o-antar" type="checkbox" class="h-4 w-4 accent-sky-600" /> Antar-jemput</label>
-    <input id="o-alamat" type="text" placeholder="Alamat (jika antar-jemput)" class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-100 mt-3 w-full" />
-    <input id="o-catatan" type="text" placeholder="Catatan (opsional)" class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-100 mt-3 w-full" />
+    <label class="mt-4 flex items-center gap-2 text-sm font-semibold text-navy"><input id="o-antar" type="checkbox" class="h-4 w-4 accent-[#1E90FF]" /> Antar-jemput</label>
+    <input id="o-alamat" type="text" placeholder="Alamat (jika antar-jemput)" class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/20 mt-3 w-full" />
+    <input id="o-catatan" type="text" placeholder="Catatan (opsional)" class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/20 mt-3 w-full" />
     <p class="mt-3 text-xs text-slate-500">Isi nama sesuai username pelanggan agar pesanan muncul di dashboard mereka.</p>
-    <div class="mt-5 flex items-center justify-between gap-3 rounded-2xl bg-slate-50 p-4"><span class="text-sm font-semibold text-slate-600">Total</span><span id="o-total" class="text-xl font-extrabold text-sky-700">Rp 0</span></div>
-    <div class="mt-5 flex justify-end gap-3"><button type="button" data-close class="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-bold hover:bg-slate-50">Batal</button><button type="submit" class="rounded-xl bg-sky-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-sky-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-sky-200">Simpan</button></div>
+    <div class="mt-5 flex items-center justify-between gap-3 rounded-2xl bg-slate-50 p-4"><span class="text-sm font-semibold text-slate-600">Total</span><span id="o-total" class="text-xl font-extrabold text-heading">Rp 0</span></div>
+    <div class="mt-5 flex justify-end gap-3"><button type="button" data-close class="rounded-full border border-slate-300 px-5 py-2.5 text-sm font-bold hover:bg-slate-50">Batal</button><button type="submit" class="rounded-full bg-navy px-6 py-3 text-sm font-bold text-white shadow-md transition hover:bg-[#093a63] focus:outline-none focus-visible:ring-4 focus-visible:ring-heading/40">Simpan</button></div>
   </form>
 </dialog>
 
 <!-- DIALOG LAYANAN -->
 <dialog id="dlg-svc" class="w-[min(94vw,32rem)] rounded-3xl p-0 shadow-2xl backdrop:bg-black/40">
   <form id="form-svc" class="p-6">
-    <h2 id="s-title" class="text-xl font-extrabold">Tambah Layanan</h2>
+    <h2 id="s-title" class="text-xl font-bold text-heading">Tambah Layanan</h2>
     <input id="s-id" type="hidden" />
     <div class="mt-4 space-y-4">
-      <div><label for="s-nama" class="block text-xs font-bold tracking-wide text-slate-600">Nama layanan</label><input id="s-nama" type="text" required class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-100 mt-1 w-full" /></div> <div><label for="s-harga" class="block text-xs font-bold tracking-wide text-slate-600">Harga per kg (Rp)</label><input id="s-harga" type="number" min="0" step="500" required class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-100 mt-1 w-full" /></div>
-      <div><label for="s-fitur" class="block text-xs font-bold tracking-wide text-slate-600">Keunggulan (satu per baris)</label><textarea id="s-fitur" rows="4" class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-100 mt-1 h-auto w-full py-3" placeholder="Cuci + Kering&#10;Wangi &amp; Bersih"></textarea></div>
-      <label class="flex items-center gap-2 text-sm font-semibold"><input id="s-aktif" type="checkbox" checked class="h-4 w-4 accent-sky-600" /> Aktif (tampil di website)</label>
+      <div><label for="s-nama" class="block text-xs font-bold tracking-wide text-navy">Nama layanan</label><input id="s-nama" type="text" required class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/20 mt-1 w-full" /></div> <div><label for="s-harga" class="block text-xs font-bold tracking-wide text-navy">Harga per kg (Rp)</label><input id="s-harga" type="number" min="0" step="500" required class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/20 mt-1 w-full" /></div>
+      <div><label for="s-fitur" class="block text-xs font-bold tracking-wide text-navy">Keunggulan (satu per baris)</label><textarea id="s-fitur" rows="4" class="h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/20 mt-1 h-auto w-full py-3" placeholder="Cuci + Kering&#10;Wangi &amp; Bersih"></textarea></div>
+      <label class="flex items-center gap-2 text-sm font-semibold text-navy"><input id="s-aktif" type="checkbox" checked class="h-4 w-4 accent-[#1E90FF]" /> Tampil di website</label>
     </div>
-    <div class="mt-5 flex justify-end gap-3"><button type="button" data-close class="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-bold hover:bg-slate-50">Batal</button><button type="submit" class="rounded-xl bg-sky-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-sky-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-sky-200">Simpan</button></div>
+    <div class="mt-5 flex justify-end gap-3"><button type="button" data-close class="rounded-full border border-slate-300 px-5 py-2.5 text-sm font-bold hover:bg-slate-50">Batal</button><button type="submit" class="rounded-full bg-navy px-6 py-3 text-sm font-bold text-white shadow-md transition hover:bg-[#093a63] focus:outline-none focus-visible:ring-4 focus-visible:ring-heading/40">Simpan</button></div>
   </form>
 </dialog>
+
+  <div class="pointer-events-none absolute inset-x-0 bottom-0 leading-[0]" aria-hidden="true">
+    <svg viewBox="0 0 1440 260" preserveAspectRatio="none" class="h-40 w-full md:h-56" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#97E3E3" d="M0 90 C 260 10, 520 10, 760 70 S 1200 190, 1440 40 L1440 260 L0 260 Z" />
+    </svg>
+  </div>
 
   <script>
     // ===== BestWash: login + penyimpanan data di browser (localStorage) =====
@@ -187,16 +186,18 @@ tailwind.config = {
       saveServices(s) { this.save('services', s); },
       settings() { return Object.assign({}, DEFAULT_SETTINGS, this.load('settings', {})); },
       saveSettings(o) { this.save('settings', o); },
-      orders() { return this.load('orders', []); },
+      orders() { return OrdersAPI.list(); },
       saveOrders(o) { this.save('orders', o); },
       customers() { return this.load('customers', []); },
+      profile(u) { return this.load('profile_' + String(u).toLowerCase(), {}); },
+      saveProfile(u, p) { this.save('profile_' + String(u).toLowerCase(), p); },
       addCustomer(username, email) {
         const list = this.customers();
         const c = list.find((x) => x.username.toLowerCase() === username.toLowerCase());
         if (c) { if (email && !c.email) c.email = email; } else list.push({ username, email: email || '', joinedAt: new Date().toISOString() });
         this.save('customers', list);
       },
-      addOrder(d) {
+      addOrder(d) { throw new Error('Gunakan OrdersAPI.create()');
         const list = this.orders();
         const t = new Date();
         const ymd = t.getFullYear() + String(t.getMonth() + 1).padStart(2, '0') + String(t.getDate()).padStart(2, '0');
@@ -215,22 +216,30 @@ tailwind.config = {
       const snap = () => { try { return ['orders', 'services', 'settings', 'customers'].map((k) => localStorage.getItem('bestwash_' + k)).join('|'); } catch (e) { return ''; } };
       let last = snap();
       const check = () => { const now = snap(); if (now !== last) { last = now; fn(); } };
-      window.addEventListener('storage', check);
+      window.addEventListener('storage', check); OrdersAPI.onChange(fn);
       setInterval(check, 1500);
     }
+
+    // Nama pengguna dibandingkan tanpa membedakan huruf besar/kecil ("Siti" = "siti")
+    const sameUser = (a, b) => String(a || '').toLowerCase() === String(b || '').toLowerCase();
 
     // Form pemesanan dengan perhitungan biaya real-time (dipakai pemesanan.html & dashboard.html)
     function initOrderForm(form, opt) {
       const q = (s) => form.querySelector(s);
-      const settings = DB.settings();
-      const svcs = DB.services().filter((s) => s.aktif);
       const list = q('[data-paket-list]');
       const want = new URLSearchParams(location.search).get('paket');
-      const sel = svcs.find((s) => s.id === want) || svcs[0];
       const icons = ['<path d="M3 8h11a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h8"/>', '<path d="M8 3l-5 4 3 3 2-1v12h8V9l2 1 3-3-5-4a4 4 0 0 1-8 0z"/>', '<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>'];
-      list.innerHTML = svcs.length ? svcs.map((s, i) => `<label class="cursor-pointer"><input type="radio" name="paket" value="${esc(s.id)}" class="peer sr-only"${s === sel ? ' checked' : ''} /><span class="flex h-full flex-col items-center gap-1 rounded-2xl border-2 border-slate-200 bg-white p-3 text-center text-sm font-bold text-slate-700 transition ${opt.checked} peer-focus-visible:ring-4 peer-focus-visible:ring-sky-200"><svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[i % 3]}</svg><span>${esc(s.nama)}</span><span class="text-xs font-semibold text-slate-500">${rp(s.harga)} / kg</span></span></label>`).join('') : '<p class="text-sm text-slate-500">Belum ada layanan aktif.</p>';
-      form.querySelectorAll('[data-ongkir-label]').forEach((el) => { el.textContent = rp(settings.ongkir); });
+      let svcs = [], settings = DB.settings();
 
+      // Daftar paket & ongkir dibaca ulang setiap data berubah (mis. admin mengubah harga atau menghapus layanan)
+      function renderPackages() {
+        settings = DB.settings();
+        svcs = DB.services().filter((s) => s.aktif);
+        const cur = q('input[name="paket"]:checked');
+        const sel = svcs.find((s) => s.id === (cur ? cur.value : want)) || svcs[0];
+        list.innerHTML = svcs.length ? svcs.map((s, i) => `<label class="cursor-pointer"><input type="radio" name="paket" value="${esc(s.id)}" class="peer sr-only"${s === sel ? ' checked' : ''} /><span class="flex h-full flex-col items-center gap-1 rounded-2xl border-2 border-slate-200 bg-white p-3 text-center text-sm font-bold text-slate-700 transition ${opt.checked} peer-focus-visible:ring-4 peer-focus-visible:ring-sky-200"><svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[i % 3]}</svg><span>${esc(s.nama)}</span><span class="text-xs font-semibold text-slate-500">${rp(s.harga)} / kg</span></span></label>`).join('') : '<p class="text-sm text-slate-500">Belum ada layanan aktif.</p>';
+        form.querySelectorAll('[data-ongkir-label]').forEach((el) => { el.textContent = rp(settings.ongkir); });
+      }
       const set = (k, v) => { const el = q('[data-sum="' + k + '"]'); if (el) el.textContent = v; };
       const calc = () => {
         const r = q('input[name="paket"]:checked');
@@ -250,20 +259,20 @@ tailwind.config = {
       };
       form.addEventListener('input', paint);
       form.addEventListener('change', paint);
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const c = calc();
-        if (!c.svc) return;
+        if (!c.svc) { alert('Paket yang dipilih tidak tersedia. Silakan pilih paket lain.'); return; }
         const v = (s) => { const el = q(s); return el ? el.value.trim() : ''; };
         const me = Auth.get();
-        const order = DB.addOrder({ user: me, nama: v('#nama') || me, hp: v('#hp'), paketId: c.svc.id, paket: c.svc.nama, harga: c.svc.harga, berat: c.berat, parfum: v('#parfum'), antar: c.antar, ongkir: c.ongkir, biaya: c.biaya, total: c.total, alamat: v('#alamat'), catatan: v('#catatan') });
+        let order; try { order = await OrdersAPI.create({ user: me, nama: v('#nama') || me, hp: v('#hp'), paketId: c.svc.id, paket: c.svc.nama, harga: c.svc.harga, berat: c.berat, parfum: v('#parfum'), antar: c.antar, ongkir: c.ongkir, biaya: c.biaya, total: c.total, alamat: v('#alamat'), catatan: v('#catatan') }); } catch (err) { return alert('Gagal mengirim pesanan: ' + (err.message || err)); }
         opt.onDone(order);
       });
-      paint();
+      renderPackages(); paint();
+      watch(() => { renderPackages(); paint(); });
       return paint;
     }
   </script>
-
   <script>
     (function () {
       if (!Auth.isAdmin()) { location.replace('login.html?admin=1'); return; }
@@ -280,11 +289,11 @@ tailwind.config = {
       const fmtD = (iso) => new Date(iso).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
       const fmtDT = (iso) => new Date(iso).toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
       const TH = 'px-3 py-3 font-bold', TD = 'px-3 py-3 align-top';
-      const BTN = 'rounded-lg border px-3 py-1.5 text-xs font-bold transition ';
+      const BTN = 'rounded-full border px-3 py-1.5 text-xs font-bold transition ';
 
       function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.remove('hidden'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.add('hidden'), 2500); }
       const table = (head, rows, empty) => rows.length
-        ? `<table class="w-full min-w-[640px] text-left text-sm"><thead class="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500"><tr>${head.map((h) => `<th class="${TH}">${h}</th>`).join('')}</tr></thead><tbody class="divide-y divide-slate-100">${rows.join('')}</tbody></table>`
+        ? `<table class="w-full min-w-[640px] text-left text-sm"><thead class="border-b border-slate-200 text-xs uppercase tracking-wide text-navy"><tr>${head.map((h) => `<th class="${TH}">${h}</th>`).join('')}</tr></thead><tbody class="divide-y divide-slate-100">${rows.join('')}</tbody></table>`
         : `<p class="px-3 py-10 text-center text-sm text-slate-500">${empty}</p>`;
       const badge = (st) => `<span class="inline-block rounded-full px-3 py-1 text-xs font-bold ${BADGE[st]}">${esc(STATUS[st])}</span>`;
       const newest = (list) => list.slice().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
@@ -297,8 +306,10 @@ tailwind.config = {
           const c = map[name.toLowerCase()] || (map[name.toLowerCase()] = { username: name, email: '', joinedAt: o.createdAt, n: 0, spend: 0 });
           c.n++; c.spend += o.total;
         });
-        return Object.values(map).sort((a, b) => b.joinedAt.localeCompare(a.joinedAt));
+        return Object.values(map).map((c) => Object.assign(c, { hp: DB.profile(c.username).hp || '' })).sort((a, b) => b.joinedAt.localeCompare(a.joinedAt));
       }
+
+      const ICON = {"orders": "<path d=\"M9 4h6a1 1 0 0 1 1 1v2H8V5a1 1 0 0 1 1-1z\"/><path d=\"M8 6H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-2M9 15l2 2 4-4\"/>", "clock": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7v5l3 2\"/>", "coins": "<ellipse cx=\"12\" cy=\"6\" rx=\"7\" ry=\"3\"/><path d=\"M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6\"/>", "users": "<circle cx=\"9\" cy=\"8\" r=\"4\"/><path d=\"M2 21c0-4 3-7 7-7s7 3 7 7M17 11a3 3 0 1 0 0-6M22 21c0-3-2-5-4-6\"/>"};
 
       // ---------- tab ----------
       function setTab() {
@@ -307,7 +318,7 @@ tailwind.config = {
         document.querySelectorAll('[data-panel]').forEach((p) => p.classList.toggle('hidden', p.dataset.panel !== tab));
         document.querySelectorAll('#nav a').forEach((a) => {
           const on = a.dataset.tab === tab;
-          a.classList.toggle('bg-sky-50', on); a.classList.toggle('text-sky-700', on); a.classList.toggle('text-slate-600', !on);
+          ['bg-white', 'text-heading'].forEach((c) => a.classList.toggle(c, on)); ['text-white', 'hover:bg-white/20'].forEach((c) => a.classList.toggle(c, !on));
         });
         $('judul').textContent = TITLES[tab][0]; $('sub').textContent = TITLES[tab][1];
       }
@@ -318,92 +329,109 @@ tailwind.config = {
         const aktif = os.filter((o) => o.status < 5).length;
         const pendapatan = os.filter((o) => o.status === 5).reduce((t, o) => t + o.total, 0);
         const cards = [
-          ['TOTAL PESANAN', os.length, 'bg-sky-50 text-sky-500'],
-          ['PESANAN AKTIF', aktif, 'bg-amber-50 text-amber-500'],
-          ['PENDAPATAN SELESAI', rp(pendapatan), 'bg-emerald-50 text-emerald-500'],
-          ['PELANGGAN', allCustomers().length, 'bg-violet-50 text-violet-500'],
+          ['TOTAL PESANAN', os.length, 'orders', 'Semua pesanan masuk'],
+          ['PESANAN AKTIF', aktif, 'clock', 'Belum selesai'],
+          ['PENDAPATAN SELESAI', rp(pendapatan), 'coins', 'Dari pesanan selesai'],
+          ['PELANGGAN', allCustomers().length, 'users', 'Terdaftar & pernah memesan'],
         ];
-        $('stat-grid').innerHTML = cards.map(([l, v, c]) => `<div class="flex items-center justify-between gap-3 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100"><div><p class="text-[11px] font-bold tracking-wide text-slate-500">${l}</p><p class="mt-1 text-2xl font-extrabold">${esc(v)}</p></div><span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${c}"><svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span></div>`).join('');
+        $('stat-grid').innerHTML = cards.map(([l, v, i, s]) => `<article class="overflow-hidden rounded-2xl border border-white/60 shadow-md"><div class="flex items-center justify-between gap-3 bg-white/85 px-5 py-4"><div class="min-w-0"><p class="text-[11px] font-bold tracking-wide text-navy">${l}</p><p class="mt-1 truncate text-2xl font-bold text-heading">${esc(v)}</p></div><span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand/15 text-heading"><svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[i]}</svg></span></div><p class="bg-nav px-5 py-2 text-xs font-semibold text-white">${s}</p></article>`).join('');
         $('recent').innerHTML = table(['ID', 'Pelanggan', 'Paket', 'Total', 'Status'], newest(os).slice(0, 5).map((o) => `<tr><td class="${TD} font-semibold">${esc(o.id)}</td><td class="${TD}">${esc(o.nama)}</td><td class="${TD}">${esc(o.paket)}</td><td class="${TD} font-semibold">${rp(o.total)}</td><td class="${TD}">${badge(o.status)}</td></tr>`), 'Belum ada pesanan.');
         const max = Math.max(1, ...STATUS.map((_, i) => os.filter((o) => o.status === i).length));
-        $('status-bars').innerHTML = STATUS.map((s, i) => { const n = os.filter((o) => o.status === i).length; return `<div><div class="flex justify-between text-xs font-semibold"><span>${esc(s)}</span><span>${n}</span></div><div class="mt-1 h-2 rounded-full bg-slate-100"><div class="h-2 rounded-full bg-sky-500" style="width:${(n / max) * 100}%"></div></div></div>`; }).join('');
+        $('status-bars').innerHTML = STATUS.map((s, i) => { const n = os.filter((o) => o.status === i).length; return `<div><div class="flex justify-between text-xs font-semibold"><span>${esc(s)}</span><span>${n}</span></div><div class="mt-1 h-2 rounded-full bg-slate-100"><div class="h-2 rounded-full bg-brand" style="width:${(n / max) * 100}%"></div></div></div>`; }).join('');
       }
 
       // ---------- pesanan ----------
       function renderPesanan() {
         const q = $('q-pesanan').value.trim().toLowerCase(), f = $('f-status').value;
         const rows = newest(DB.orders()).filter((o) => (f === '' || String(o.status) === f) && (!q || [o.id, o.nama, o.user, o.paket].join(' ').toLowerCase().includes(q)));
+        const pri = (o) => (o.status < 5 ? (o.memberTier ? tierOf(o.memberTier).prioritas : (o.prioritas ? 1 : 0)) : 0);
+        rows.sort((a, b) => pri(b) - pri(a));   // Gold > Silver > Bronze > non-member dikerjakan lebih dulu
         $('tbl-pesanan').innerHTML = table(['Pesanan', 'Pelanggan', 'Layanan', 'Total', 'Status', 'Aksi'], rows.map((o) => `<tr>
-          <td class="${TD} font-semibold">${esc(o.id)}<div class="text-xs font-normal text-slate-500">${fmtDT(o.createdAt)}</div></td>
+          <td class="${TD} font-semibold">${esc(o.id)}${o.prioritas ? ' <span class="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">' + (o.memberTier ? esc(tierOf(o.memberTier).nama.toUpperCase()) : 'PRIORITAS') + '</span>' : ''}<div class="text-xs font-normal text-slate-500">${fmtDT(o.createdAt)}</div></td>
           <td class="${TD}">${esc(o.nama)}<div class="text-xs text-slate-500">${esc(o.hp)}</div></td>
-          <td class="${TD}">${esc(o.paket)}<div class="text-xs text-slate-500">${o.berat} kg${o.antar ? ' · antar-jemput' : ''}</div></td>
+          <td class="${TD}">${esc(o.paket)}<div class="text-xs ${o.berat > 0 ? 'text-slate-500' : 'font-semibold text-amber-600'}">${o.berat > 0 ? o.berat + ' kg' : 'belum ditimbang'}${o.antar ? ' · antar-jemput' + (o.jarak != null ? ' (' + o.jarak + ' km)' : '') : ''}</div><div class="text-xs text-slate-500">${o.member ? 'Member -' + o.diskon + '% · ' : ''}${o.voucherPersen > 0 ? 'Voucher -' + o.voucherPersen + '% · ' : ''}${esc(o.bayar)} · ${o.bayarStatus === 'lunas' ? '<b class="text-emerald-600">lunas</b>' : 'belum bayar'}</div></td>
           <td class="${TD} font-semibold">${rp(o.total)}</td>
           <td class="${TD}"><select data-act="status" data-id="${esc(o.id)}" aria-label="Status ${esc(o.id)}" class="rounded-lg border-0 py-1.5 pl-3 pr-8 text-xs font-bold ${BADGE[o.status]}">${STATUS.map((s, i) => `<option value="${i}"${i === o.status ? ' selected' : ''}>${esc(s)}</option>`).join('')}</select></td>
-          <td class="${TD} whitespace-nowrap"><button type="button" data-act="edit" data-id="${esc(o.id)}" class="${BTN}border-slate-200 hover:bg-slate-50">Edit</button> <button type="button" data-act="del" data-id="${esc(o.id)}" class="${BTN}border-rose-200 text-rose-600 hover:bg-rose-50">Hapus</button></td></tr>`), 'Tidak ada pesanan yang cocok.');
+          <td class="${TD} whitespace-nowrap">${o.berat > 0 ? '' : `<button type="button" data-act="timbang" data-id="${esc(o.id)}" class="${BTN}border-amber-300 text-amber-700 hover:bg-amber-50">Timbang</button> `}${o.bayarStatus === 'lunas' ? '' : `<button type="button" data-act="lunas" data-id="${esc(o.id)}" class="${BTN}border-emerald-300 text-emerald-700 hover:bg-emerald-50">Lunas</button> `}<button type="button" data-act="edit" data-id="${esc(o.id)}" class="${BTN}border-heading/30 text-heading hover:bg-brand/10">Edit</button> <button type="button" data-act="del" data-id="${esc(o.id)}" class="${BTN}border-rose-300 text-rose-600 hover:bg-rose-50">Hapus</button></td></tr>`), 'Tidak ada pesanan yang cocok.');
       }
       $('tbl-pesanan').addEventListener('change', (e) => {
         if (e.target.dataset.act !== 'status') return;
         const list = DB.orders(), o = list.find((x) => x.id === e.target.dataset.id);
         if (!o) return;
-        o.status = parseInt(e.target.value, 10); o.updatedAt = new Date().toISOString();
-        DB.saveOrders(list); render(); toast('Status ' + o.id + ' diubah: ' + STATUS[o.status]);
+        const st = parseInt(e.target.value, 10);
+        if (st >= 2 && !(o.berat > 0)) { render(); return toast('Timbang cucian dulu (tombol Timbang) sebelum lanjut ke Proses Cuci.'); }
+        OrdersAPI.update(o.id, { status: st }).then(() => toast('Status ' + o.id + ' diubah: ' + STATUS[st])).catch((err) => { render(); toast('Gagal: ' + (err.message || err)); });
       });
       $('tbl-pesanan').addEventListener('click', (e) => {
         const b = e.target.closest('button[data-act]'); if (!b) return;
         const list = DB.orders(), o = list.find((x) => x.id === b.dataset.id); if (!o) return;
         if (b.dataset.act === 'edit') openOrder(o);
-        if (b.dataset.act === 'del' && confirm('Hapus pesanan ' + o.id + '?')) { DB.saveOrders(list.filter((x) => x.id !== o.id)); render(); toast('Pesanan dihapus'); }
+        if (b.dataset.act === 'timbang') openOrder(o, true);
+        if (b.dataset.act === 'lunas' && !(o.berat > 0)) return toast('Timbang cucian dulu sebelum menandai lunas.');
+        if (b.dataset.act === 'lunas') OrdersAPI.update(o.id, { bayarStatus: 'lunas' }).then(() => toast('Pembayaran ' + o.id + ' ditandai lunas')).catch((err) => toast('Gagal: ' + (err.message || err)));
+        if (b.dataset.act === 'del' && confirm('Hapus pesanan ' + o.id + '?')) { OrdersAPI.remove(o.id).then(() => toast('Pesanan dihapus')).catch((err) => toast('Gagal: ' + (err.message || err))); }
       });
       $('q-pesanan').addEventListener('input', renderPesanan);
       $('f-status').addEventListener('change', renderPesanan);
 
+      // layanan yang sudah dihapus tetapi masih dipakai pesanan yang sedang diedit
+      let ghost = null;
+      const svcFor = (id) => DB.services().find((s) => s.id === id) || (ghost && ghost.id === id ? ghost : undefined);
       function orderTotal() {
-        const svc = DB.services().find((s) => s.id === $('o-svc').value), id = $('o-id').value;
+        const svc = svcFor($('o-svc').value), id = $('o-id').value;
         const old = id ? DB.orders().find((x) => x.id === id) : null;
         const harga = svc ? (old && old.paketId === svc.id ? old.harga : svc.harga) : 0;
         const berat = parseFloat($('o-berat').value) || 0;
         const ongkir = $('o-antar').checked ? (old && old.antar ? old.ongkir : DB.settings().ongkir) : 0;
-        return { svc, harga, berat, ongkir, biaya: harga * berat, total: harga * berat + ongkir };
+        const diskon = old ? old.diskon || 0 : 0;   // diskon member yang tercatat di pesanan
+        const biaya = harga * berat;
+        const setelahDiskon = Math.round(biaya * (1 - diskon / 100));
+        const voucher = Math.round(setelahDiskon * (old ? old.voucherPersen || 0 : 0) / 100);   // voucher hasil tukar poin (%), setelah diskon member
+        return { svc, harga, berat, ongkir, biaya, voucher, total: setelahDiskon - voucher + ongkir };
       }
-      function openOrder(o) {
+      function paintTotal() {
+        const c = orderTotal();
+        $('o-total').textContent = rp(c.total) + (c.berat > 0 ? '' : ' (belum ditimbang)');
+      }
+      function openOrder(o, focusBerat) {
         $('o-title').textContent = o ? 'Edit Pesanan ' + o.id : 'Tambah Pesanan';
         $('o-id').value = o ? o.id : '';
-        const act = DB.services().filter((s) => s.aktif || (o && s.id === o.paketId));
+        ghost = o && !DB.services().some((s) => s.id === o.paketId) ? { id: o.paketId, nama: o.paket + ' (dihapus)', harga: o.harga, aktif: false } : null;
+        const act = DB.services().filter((s) => s.aktif || (o && s.id === o.paketId)).concat(ghost ? [ghost] : []);
         $('o-svc').innerHTML = act.map((s) => `<option value="${esc(s.id)}">${esc(s.nama)} (${rp(s.harga)}/kg)</option>`).join('');
         $('o-nama').value = o ? o.nama : ''; $('o-hp').value = o ? o.hp || '' : '';
         if (o) $('o-svc').value = o.paketId;
-        $('o-berat').value = o ? o.berat : 3;
+        $('o-berat').value = o && o.berat > 0 ? o.berat : '';   // kosong = belum ditimbang
         $('o-parfum').value = o && o.parfum ? o.parfum : 'Ocean Fresh';
         $('o-status').value = o ? o.status : 0;
         $('o-antar').checked = o ? !!o.antar : false;
         $('o-alamat').value = o ? o.alamat || '' : ''; $('o-catatan').value = o ? o.catatan || '' : '';
-        $('o-total').textContent = rp(orderTotal().total);
+        paintTotal();
         $('dlg-order').showModal();
+        if (focusBerat) $('o-berat').focus();
       }
       $('btn-add-order').addEventListener('click', () => {
         if (!DB.services().some((s) => s.aktif)) return toast('Aktifkan minimal satu layanan dulu.');
         openOrder(null);
       });
-      $('form-order').addEventListener('input', () => { $('o-total').textContent = rp(orderTotal().total); });
-      $('form-order').addEventListener('submit', (e) => {
+      $('form-order').addEventListener('input', () => { paintTotal(); });
+      $('form-order').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const c = orderTotal(); if (!c.svc) return;
+        const c = orderTotal(); if (!c.svc) return toast('Pilih layanan terlebih dahulu.');
+        if (parseInt($('o-status').value, 10) >= 2 && !(c.berat > 0)) return toast('Isi berat cucian dulu sebelum status diubah ke Proses Cuci atau tahap berikutnya.');
         const id = $('o-id').value, nama = $('o-nama').value.trim();
-        const data = { nama, hp: $('o-hp').value.trim(), paketId: c.svc.id, paket: c.svc.nama, harga: c.harga, berat: c.berat, parfum: $('o-parfum').value, antar: $('o-antar').checked, ongkir: c.ongkir, biaya: c.biaya, total: c.total, alamat: $('o-alamat').value.trim(), catatan: $('o-catatan').value.trim(), status: parseInt($('o-status').value, 10) };
-        if (id) {
-          const list = DB.orders(), o = list.find((x) => x.id === id);
-          Object.assign(o, data, { updatedAt: new Date().toISOString() }); DB.saveOrders(list);
-        } else { DB.addOrder(Object.assign({ user: nama }, data)); DB.addCustomer(nama); }
+        const data = { nama, hp: $('o-hp').value.trim(), paketId: c.svc.id, paket: c.svc.nama.replace(/ \(dihapus\)$/, ''), harga: c.harga, berat: c.berat, parfum: $('o-parfum').value, antar: $('o-antar').checked, ongkir: c.ongkir, biaya: c.biaya, total: c.total, alamat: $('o-alamat').value.trim(), catatan: $('o-catatan').value.trim(), status: parseInt($('o-status').value, 10) };
+        try {
+          if (id) await OrdersAPI.update(id, data);
+          else { await OrdersAPI.create(Object.assign({ user: nama }, data), true); DB.addCustomer(nama); }
+        } catch (err) { return toast('Gagal: ' + (err.message || err)); }
         $('dlg-order').close(); render(); toast('Pesanan disimpan');
       });
 
       // ---------- layanan ----------
       function renderLayanan() {
-        $('tbl-layanan').innerHTML = table(['Layanan', 'Harga / kg', 'Keunggulan', 'Status', 'Aksi'], DB.services().map((s) => `<tr>
-          <td class="${TD} font-semibold">${esc(s.nama)}</td><td class="${TD}">${rp(s.harga)}</td>
-          <td class="${TD} text-slate-600">${esc((s.fitur || []).join(', '))}</td>
-          <td class="${TD}"><button type="button" data-act="toggle" data-id="${esc(s.id)}" class="${BTN}${s.aktif ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-slate-200 bg-slate-50 text-slate-500'}">${s.aktif ? 'Aktif' : 'Nonaktif'}</button></td>
-          <td class="${TD} whitespace-nowrap"><button type="button" data-act="edit" data-id="${esc(s.id)}" class="${BTN}border-slate-200 hover:bg-slate-50">Edit</button> <button type="button" data-act="del" data-id="${esc(s.id)}" class="${BTN}border-rose-200 text-rose-600 hover:bg-rose-50">Hapus</button></td></tr>`), 'Belum ada layanan.');
+        const list = DB.services();
+        $('tbl-layanan').innerHTML = list.length ? `<div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">${list.map((s) => `<article class="overflow-hidden rounded-2xl border border-white/60 shadow-md ${s.aktif ? '' : 'opacity-70'}"><div class="bg-white/85 px-5 py-4"><h3 class="text-lg font-bold text-heading">${esc(s.nama)}</h3><p class="mt-1 text-2xl font-bold text-heading">${rp(s.harga)}<span class="text-xs font-medium text-navy"> /kg</span></p></div><ul class="space-y-1 bg-nav px-5 pb-2 pt-4 text-sm font-semibold text-white">${(s.fitur || []).map((f) => `<li class="flex gap-2 before:content-['✓'] before:font-bold">${esc(f)}</li>`).join('') || '<li class="text-white/70">Belum ada keunggulan</li>'}</ul><div class="flex flex-wrap gap-2 bg-nav px-5 pb-4 pt-3"><button type="button" data-act="toggle" data-id="${esc(s.id)}" aria-pressed="${s.aktif}" title="${s.aktif ? 'Klik untuk menyembunyikan dari website' : 'Klik untuk menampilkan di website'}" class="rounded-full px-3 py-1.5 text-xs font-bold ${s.aktif ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'}">${s.aktif ? 'Tampil di website' : 'Disembunyikan'}</button><button type="button" data-act="edit" data-id="${esc(s.id)}" class="rounded-full bg-white/90 px-3 py-1.5 text-xs font-bold text-heading hover:bg-white">Edit</button><button type="button" data-act="del" data-id="${esc(s.id)}" class="rounded-full bg-rose-100 px-3 py-1.5 text-xs font-bold text-rose-700 hover:bg-rose-200">Hapus</button></div></article>`).join('')}</div>` : '<p class="px-3 py-10 text-center text-sm text-slate-500">Belum ada layanan.</p>';
       }
       $('tbl-layanan').addEventListener('click', (e) => {
         const b = e.target.closest('button[data-act]'); if (!b) return;
@@ -436,7 +464,7 @@ tailwind.config = {
       function renderPelanggan() {
         const q = $('q-pelanggan').value.trim().toLowerCase();
         const rows = allCustomers().filter((c) => !q || (c.username + ' ' + c.email).toLowerCase().includes(q));
-        $('tbl-pelanggan').innerHTML = table(['Username', 'Email', 'Bergabung', 'Pesanan', 'Total Belanja'], rows.map((c) => `<tr><td class="${TD} font-semibold">${esc(c.username)}</td><td class="${TD}">${esc(c.email) || '-'}</td><td class="${TD}">${fmtD(c.joinedAt)}</td><td class="${TD}">${c.n}</td><td class="${TD} font-semibold">${rp(c.spend)}</td></tr>`), 'Belum ada pelanggan.');
+        $('tbl-pelanggan').innerHTML = table(['Username', 'Email', 'WhatsApp', 'Bergabung', 'Pesanan', 'Total Belanja'], rows.map((c) => `<tr><td class="${TD} font-semibold">${esc(c.username)}</td><td class="${TD}">${esc(c.email) || '-'}</td><td class="${TD}">${esc(c.hp) || '-'}</td><td class="${TD}">${fmtD(c.joinedAt)}</td><td class="${TD}">${c.n}</td><td class="${TD} font-semibold">${rp(c.spend)}</td></tr>`), 'Belum ada pelanggan.');
       }
       $('q-pelanggan').addEventListener('input', renderPelanggan);
 
@@ -453,10 +481,10 @@ tailwind.config = {
         os.forEach((o) => { const r = per[o.paket] || (per[o.paket] = { n: 0, kg: 0, nilai: 0 }); r.n++; r.kg += o.berat; r.nilai += o.total; });
         const days = [...Array(7)].map((_, i) => { const d = new Date(Date.now() - (6 - i) * 864e5); return { label: d.toLocaleDateString('id-ID', { weekday: 'short' }), n: all.filter((o) => new Date(o.createdAt).toDateString() === d.toDateString()).length }; });
         const max = Math.max(1, ...days.map((d) => d.n));
-        $('laporan').innerHTML = `<div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">${cards.map(([l, v]) => `<div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100"><p class="text-[11px] font-bold uppercase tracking-wide text-slate-500">${l}</p><p class="mt-1 text-2xl font-extrabold">${esc(v)}</p></div>`).join('')}</div>
+        $('laporan').innerHTML = `<div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">${cards.map(([l, v]) => `<div class="rounded-2xl bg-white/95 p-5 shadow-lg"><p class="text-[11px] font-bold uppercase tracking-wide text-slate-500">${l}</p><p class="mt-1 text-2xl font-extrabold">${esc(v)}</p></div>`).join('')}</div>
           <div class="grid gap-6 xl:grid-cols-2">
-            <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-100"><h2 class="text-lg font-extrabold">Per Layanan</h2><div class="mt-3 overflow-x-auto">${table(['Layanan', 'Pesanan', 'Berat', 'Nilai'], Object.keys(per).map((k) => `<tr><td class="${TD} font-semibold">${esc(k)}</td><td class="${TD}">${per[k].n}</td><td class="${TD}">${per[k].kg} kg</td><td class="${TD} font-semibold">${rp(per[k].nilai)}</td></tr>`), 'Belum ada data pada periode ini.')}</div></div>
-            <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-100"><h2 class="text-lg font-extrabold">Pesanan 7 Hari Terakhir</h2><div class="mt-4 flex h-40 items-end gap-3">${days.map((d) => `<div class="flex flex-1 flex-col items-center justify-end gap-1"><span class="text-xs font-bold">${d.n}</span><div class="w-full rounded-t-lg bg-sky-500" style="height:${(d.n / max) * 100}px;min-height:2px"></div><span class="text-[11px] text-slate-500">${esc(d.label)}</span></div>`).join('')}</div></div>
+            <div class="rounded-2xl bg-white/95 p-5 shadow-lg"><h2 class="text-lg font-extrabold">Per Layanan</h2><div class="mt-3 overflow-x-auto">${table(['Layanan', 'Pesanan', 'Berat', 'Nilai'], Object.keys(per).map((k) => `<tr><td class="${TD} font-semibold">${esc(k)}</td><td class="${TD}">${per[k].n}</td><td class="${TD}">${per[k].kg} kg</td><td class="${TD} font-semibold">${rp(per[k].nilai)}</td></tr>`), 'Belum ada data pada periode ini.')}</div></div>
+            <div class="rounded-2xl bg-white/95 p-5 shadow-lg"><h2 class="text-lg font-extrabold">Pesanan 7 Hari Terakhir</h2><div class="mt-4 flex h-40 items-end gap-3">${days.map((d) => `<div class="flex flex-1 flex-col items-center justify-end gap-1"><span class="text-xs font-bold">${d.n}</span><div class="w-full rounded-t-lg bg-brand" style="height:${(d.n / max) * 100}px;min-height:2px"></div><span class="text-[11px] text-slate-500">${esc(d.label)}</span></div>`).join('')}</div></div>
           </div>`;
       }
       $('periode').addEventListener('change', renderLaporan);
@@ -486,7 +514,7 @@ tailwind.config = {
         });
         render(); toast('Data contoh ditambahkan');
       });
-      $('btn-clear-orders').addEventListener('click', () => { if (confirm('Hapus SEMUA pesanan?')) { DB.saveOrders([]); render(); toast('Semua pesanan dihapus'); } });
+      $('btn-clear-orders').addEventListener('click', () => { if (confirm('Hapus SEMUA pesanan?')) { OrdersAPI.removeAll().then(() => toast('Semua pesanan dihapus')).catch((err) => toast('Gagal: ' + (err.message || err))); } });
       $('btn-reset').addEventListener('click', () => {
         if (!confirm('Reset semua data (pesanan, layanan, pelanggan, pengaturan)?')) return;
         ['orders', 'services', 'settings', 'customers'].forEach((k) => localStorage.removeItem('bestwash_' + k));
@@ -494,14 +522,13 @@ tailwind.config = {
       });
 
       document.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', () => b.closest('dialog').close()));
-      $('logout').addEventListener('click', () => { Auth.clear(); location.href = 'landingpage.html'; });
+      $('logout').addEventListener('click', () => { Auth.clear(); BestWashAuth.logout(); });
 
       function render() { renderRingkasan(); renderPesanan(); renderLayanan(); renderPelanggan(); renderLaporan(); }
       window.addEventListener('hashchange', setTab);
       setTab(); fillSettings(); render();
       watch(render);   // pesanan baru dari pelanggan muncul otomatis
     })();
-
   </script>
 </body>
 </html>
